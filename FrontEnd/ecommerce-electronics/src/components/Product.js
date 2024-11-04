@@ -1,19 +1,26 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { useCartContext } from '../contexts/Cart_Context';
 const Product = (product) => {
+    const { addToCart } = useCartContext();
+    console.log(addToCart);
     return (
         <>
             <ProductWrapper>
                 <div className="container">
-                    <img src={product.image} alt={product.name} />
-                    <Link to={`/product/${product.id}`} className='link '></Link>
-
+                    <Link to={`/product/${product.id}`} className='link'>
+                        <img src={product.image} alt={product.name} />
+                    </Link>
                     <span className='w-tag'>Phone</span>
+                    <span className='w-tag'>256gb</span>
                     <footer>
-                        <h3 className='w-name'>{product.name}</h3>
+                        <Link to={`/product/${product.id}`} className='link'>
+                            <h3 className='w-name'>{product.name}</h3>
+                        </Link>
                         <p className='w-price'>{product.price}</p>
-                        <button className='buy-now'>Mua Ngay</button>
+                        <button className='buy-now' onClick={() => addToCart(product)}>Thêm vào giỏ hàng</button>
+                        {console.log(() => addToCart(product))}
                     </footer>
                 </div>
             </ProductWrapper>
@@ -36,22 +43,7 @@ const ProductWrapper = styled.article`
         border-radius: var(--radius);
         transition: var(--transition);
     }
-    .link {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: var(--clr-primary-5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 2.5rem;
-        height: 2.5rem;
-        border-radius: 50%;
-        transition: var(--transition);
-        opacity: 0;
-        cursor: pointer;
-    }
+    
     .container:hover img {
         opacity: 0.5;
     }
@@ -61,13 +53,20 @@ const ProductWrapper = styled.article`
     .w-tag{
         display:flex;
         text-align:center;
+        width: max-content;
         justify-content:center;
         background-color: #f0f0f0; /* Màu xám nhạt */
         font-style: italic; /* Kiểu chữ in nghiêng */
         font-size: 0.8rem; 
+        margin: 0.5rem ; /* Căn giữa theo chiều ngang */
     }
     .w-name {
-
+        opacity: 1; /* Đảm bảo .w-name luôn hiển thị */
+        
+    }
+    .w-name:hover + .link{
+        opacity: 1;
+        
     }
     .w-price {
         color: red; /* Chữ màu đỏ */
@@ -75,8 +74,9 @@ const ProductWrapper = styled.article`
     }
     .buy-now {
         background-color: #70d6f4; /* Màu nền xanh dương */
-        color: white; /* Màu chữ trắng */
+        color: black; /* Màu chữ trắng */
         border: none; /* Không viền */
+      
         padding: 10px 20px; /* Đệm trên dưới 10px, trái phải 20px */
         font-size: 1rem; /* Cỡ chữ */
         cursor: pointer; /* Con trỏ chuột khi di chuyển vào button */
@@ -87,7 +87,7 @@ const ProductWrapper = styled.article`
     }
 
     .buy-now:hover {
-        background-color: #0056b3; /* Màu nền khi hover */
+        background-color: rgba(0, 248, 147, 0.44); /* Màu nền khi hover */
     }
 `;
 export default Product;

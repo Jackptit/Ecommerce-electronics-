@@ -7,7 +7,7 @@ import Sliding from '../assets/Sliding-airpod-4.webp';
 import Headphone from '../assets/tai-nghe-sony-wf-c510-home.webp';
 import Phone from '../assets/tecno-spark-go-1-home.webp';
 import FeaturedProducts from '../components/FeaturedProducts';
-
+import { useReducer, useState } from 'react';
 
 const Home = () => {
     const settings = {
@@ -35,6 +35,7 @@ const Home = () => {
                         </div>
                     </Slider>
                 </SliderWrapper>
+                <FeaturedProducts />
                 <FeaturedProducts />
             </Wrapper>
         </>
