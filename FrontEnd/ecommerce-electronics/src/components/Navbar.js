@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FaSearch, FaUser, FaShoppingCart, FaMapMarkerAlt, FaMobileAlt, FaLaptop, FaHeadphones, FaTabletAlt, FaClock, FaBell, FaFilter } from 'react-icons/fa';
-
+import { Link } from 'react-router-dom';
 // Styled Components
 const Navbarr = styled.nav`
   z-index: 1000;
   width: 100%;
-  background-color: #FFD600;
+  background-color: #FFD600
   position: fixed;
   padding: 10px 0;
   display: flex;
