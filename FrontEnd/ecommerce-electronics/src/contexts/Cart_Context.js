@@ -11,18 +11,23 @@ const init = {
 const Cart_Context = React.createContext();
 export const CartProvider = ({ children }) => {
     const [state, dispatch] = useReducer(Cart_Reducer, init);
-    const [count, setCount] = useState(state.amount);
     const addToCart = (product) => {
         dispatch({ type: 'ADD_TO_CART', payload: product });
     }
+    const increaseQuantity = (id) => {
+        dispatch({ type: 'INCREASE_QUANTITY', payload: id });
+    }
+    const decreaseQuantity = (id) => {
+        dispatch({ type: 'DECREASE_QUANTITY', payload: id });
+    }
+    const removeItem = (id) => {
+        dispatch({ type: 'REMOVE_ITEM', payload: id })
+    };
     useEffect(() => {
-        setCount(state.amount);
-        if (state.amount > 0) {
-            toast.success("Sản phẩm đã thêm vào giỏ hàng!");
-        }
+        toast.success("Sản phẩm đã thêm vào giỏ hàng!");
     }, [state.amount]);
     return (
-        <Cart_Context.Provider value={{ ...state, addToCart }}>
+        <Cart_Context.Provider value={{ ...state, addToCart, increaseQuantity, decreaseQuantity, removeItem }}>
             {children}
             <ToastContainer position="top-right" autoClose={3000} />
         </Cart_Context.Provider>

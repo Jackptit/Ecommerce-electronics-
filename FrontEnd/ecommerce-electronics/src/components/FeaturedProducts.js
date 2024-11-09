@@ -52,7 +52,6 @@ const FeaturedProducts = () => {
             image: 'https://cdn.tgdd.vn/Products/Images/42/329008/xiaomi-redmi-14c-blue-1-600x600.jpg'
         }
     ];
-    console.log(products);
     return (
         <>
             <Wrapper>

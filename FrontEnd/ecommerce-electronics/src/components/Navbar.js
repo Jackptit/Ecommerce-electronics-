@@ -1,16 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FaSearch, FaUser, FaShoppingCart, FaMapMarkerAlt, FaMobileAlt, FaLaptop, FaHeadphones, FaTabletAlt, FaClock, FaBell, FaFilter } from 'react-icons/fa';
-
+import { Link } from 'react-router-dom';
 // Styled Components
 const Navbarr = styled.nav`
-  z-index: 1000;
+  z-index: 100;
   width: 100%;
   background-color: #FFD600;
   position: fixed;
   padding: 10px 0;
   display: flex;
   align-items: center;
+  height:60px;
   justify-content: space-between;
 `;
 
@@ -81,9 +82,10 @@ const IconLinks = styled.div`
 const Categories = styled.div`
   display: flex;
   justify-content: space-around;
-  padding: 10px 0;
+  height: 40px;
   background-color: #FFD600;
-
+  padding-top: 100px;
+  
   a {
     display: flex;
     align-items: center;
@@ -106,13 +108,15 @@ const Navbar = () => {
   return (
     <>
       <Navbarr>
-        <Logo>
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPPX1d6sn9wWE36oDc1sOz56DV7789e20PlQ&s" alt="shop" />
-          <div>
-            <h1> EEShop </h1>
-            <p> Thế giới điện tử </p>
-          </div>
-        </Logo>
+        <Link to='/'>
+          <Logo>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPPX1d6sn9wWE36oDc1sOz56DV7789e20PlQ&s" alt="shop" />
+            <div>
+              <h1> EEShop </h1>
+              <p> Thế giới điện tử </p>
+            </div>
+          </Logo>
+        </Link>
         <SearchBar>
           <FaSearch />
           <input type="text" placeholder="Bạn tìm gì?" />
@@ -122,7 +126,9 @@ const Navbar = () => {
         </SearchBar>
         <IconLinks>
           <a href="#"><FaUser /> Đăng nhập</a>
-          <a href="#"><FaShoppingCart /> Giỏ hàng</a>
+          <Link to="/cart">
+            <FaShoppingCart /> Giỏ hàng
+          </Link>
           <a href="#"><FaMapMarkerAlt /> Hà Nội</a>
         </IconLinks>
       </Navbarr>
@@ -132,7 +138,7 @@ const Navbar = () => {
         <a href="#"><FaHeadphones /> Phụ kiện</a>
         <a href="#"><FaTabletAlt /> Tablet</a>
         <a href="#"><FaClock /> Đồng hồ</a>
-        <a href="#"><FaBell /> Máy cũ, Thu cũ</a>
+        <a href="#"><FaBell />Hàng secondHand</a>
       </Categories>
     </>
   );

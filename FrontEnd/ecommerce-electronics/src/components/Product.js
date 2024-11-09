@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { useCartContext } from '../contexts/Cart_Context';
 const Product = (product) => {
     const { addToCart } = useCartContext();
-    console.log(addToCart);
     return (
         <>
             <ProductWrapper>
@@ -20,7 +19,6 @@ const Product = (product) => {
                         </Link>
                         <p className='w-price'>{product.price}</p>
                         <button className='buy-now' onClick={() => addToCart(product)}>Thêm vào giỏ hàng</button>
-                        {console.log(() => addToCart(product))}
                     </footer>
                 </div>
             </ProductWrapper>

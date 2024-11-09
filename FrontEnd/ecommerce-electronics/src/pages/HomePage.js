@@ -43,7 +43,16 @@ const Home = () => {
 }
 const SliderWrapper = styled.div`
     margin-top: 20px;
-   
+    max-width: 80%;  // Giới hạn chiều rộng tối đa của slider
+    margin-left: auto;  // Căn giữa slider
+    margin-right: auto;  // Căn giữa slider
+    padding: 0 10%; 
+    max-height: 200px;  // Giới hạn chiều cao tối đa của slider
+    .img-slick img {
+    width: 100%;  // Đảm bảo ảnh chiếm toàn bộ chiều rộng của container
+    height: auto;  // Giữ tỷ lệ nguyên vẹn của ảnh
+    object-fit: cover;  // Đảm bảo ảnh che phủ toàn bộ không gian mà không làm thay đổi tỷ lệ
+}
 `;
 const Wrapper = styled.div`
     background-color: #f6f5fa;
