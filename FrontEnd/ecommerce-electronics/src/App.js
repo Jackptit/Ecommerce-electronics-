@@ -7,6 +7,8 @@ import Footer from './components/Footer';
 import ProductPage from './pages/ProductPage';
 import CartPage from './pages/CartPage';
 import ChatBot from 'react-chatbotify'
+import Login from './components/Login';
+import Register from './components/Register';
 function App() {
   const settings = {
     avatar: 'https://inkythuatso.com/uploads/thumbnails/800/2021/10/logo-messenger-inkythuatso-2-01-30-15-48-06.jpg',
@@ -21,11 +23,12 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/cart" element={<CartPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
           </Routes>
           <Footer />
         </Router>
       </div >
-
     </>
   );
 }
