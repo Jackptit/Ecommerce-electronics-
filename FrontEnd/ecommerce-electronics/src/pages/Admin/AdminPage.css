@@ -1,0 +1,17 @@
+.admin-page {
+    display: flex;
+  }
+  
+  .main-content {
+    margin-left: 250px;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+  }
+  
+  .content {
+    padding: 20px;
+    margin-top: 60px; /* Cách từ header xuống (giả sử chiều cao header là 60px) */
+    height: calc(100vh - 60px); /* Đảm bảo phần còn lại của trang có chiều cao đủ */
+    overflow-y: auto; /* Thêm cuộn dọc cho nội dung */
+  }
