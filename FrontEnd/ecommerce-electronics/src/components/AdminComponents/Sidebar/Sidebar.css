@@ -1,0 +1,74 @@
+.admin-sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: #333;
+  color: white;
+  padding-top: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Đảm bảo các item không bị đẩy xuống dưới */
+  align-items: center; /* Căn giữa các item theo chiều ngang */
+}
+
+.sidebar-header {
+  text-align: center;
+  margin-bottom: 30px; /* Thêm khoảng cách dưới logo */
+}
+
+.sidebar-logo {
+  width: 80px; /* Đặt kích thước logo */
+  height: auto;
+  border-radius: 50%;
+}
+
+.shop-name {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
+  color: #f39c12;
+}
+
+.admin-sidebar ul {
+  list-style-type: none;
+  padding-left: 0;
+  width: 100%; /* Đảm bảo các mục chiếm toàn bộ chiều rộng */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Căn giữa các item trong sidebar */
+}
+
+.admin-sidebar li {
+  width: 100%; /* Đảm bảo các mục chiếm toàn bộ chiều rộng */
+}
+
+.admin-sidebar li a {
+  display: flex;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 15px;
+  width: 100%;
+  justify-content: center; /* Căn giữa các mục */
+  /* background-color: #444; */
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.admin-sidebar li a:hover {
+  background-color: #575757;
+  padding-left: 10px;
+  border-radius: 5px;
+}
+
+.admin-sidebar li a i {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+.admin-sidebar li a:hover i {
+  color: #f39c12;
+}

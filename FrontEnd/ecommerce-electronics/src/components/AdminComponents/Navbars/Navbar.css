@@ -1,0 +1,75 @@
+.header {
+    display: flex;
+    justify-content: space-between; /* Căn giữa các phần tử con theo chiều ngang */
+    align-items: center; /* Căn giữa các phần tử con theo chiều dọc */
+    background-color: #444;
+    color: white;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 60px;
+    position: fixed; /* Đặt vị trí cố định cho header */
+    top: 0; /* Đặt nó ở phần đầu trang */
+    left: 0;
+    z-index: 1000;
+    width: calc(100% - 250px);
+    margin-left: 250px;
+  }
+  
+  .header-title {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  
+  .user-info span {
+    margin-left: 10px; /* Khoảng cách giữa icon và tên */
+  }
+  
+  .user-info-button {
+    background: none;
+    border: none;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  .dropdown {
+    position: absolute;
+    top: 35px; /* Điều chỉnh vị trí dropdown để không bị che mất */
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    width: 150px;
+    z-index: 10; /* Đảm bảo dropdown xuất hiện trên các phần tử khác */
+    visibility: hidden; /* Ẩn dropdown */
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease; /* Hiệu ứng chuyển động */
+  }
+  
+  .dropdown.show {
+    visibility: visible; /* Hiển thị dropdown */
+    opacity: 1; /* Hiệu ứng mờ dần */
+  }
+  
+  .dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .dropdown li {
+    padding: 10px;
+    cursor: pointer;
+    color: #333; /* Đảm bảo màu chữ dễ đọc */
+  }
+  
+  .dropdown li:hover {
+    background-color: #f4f4f4; /* Hover effect */
+    color: #444; /* Đổi màu chữ khi hover để dễ nhìn */
+  }
+  
