@@ -3,19 +3,24 @@ import ReactDOM from "react-dom/client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import 'react-toastify/dist/ReactToastify.css';
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "./contexts/Auth_Context";
 import { CartProvider } from "./contexts/Cart_Context";
 import { UserProvider } from "./contexts/UserContext";
+import { ToastContainer, toast } from 'react-toastify';
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <UserProvider>
-      <CartProvider>
-        <App />
-      </CartProvider>
-    </UserProvider>
+    <AuthProvider>
+      <UserProvider>
+        <CartProvider>
+          <App />
+          <ToastContainer />
+        </CartProvider>
+      </UserProvider>
+    </AuthProvider>
   </React.StrictMode>
 );
 

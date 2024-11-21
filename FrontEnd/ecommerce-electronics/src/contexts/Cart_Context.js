@@ -2,7 +2,7 @@ import React from "react";
 import { useReducer, useContext, useState, useEffect } from "react";
 import Cart_Reducer from "../reducers/Cart_Reducer";
 import 'react-toastify/dist/ReactToastify.css';
-import { toast, ToastContainer } from "react-toastify";
+
 const init = {
     cart: [],
     total: 0,
@@ -10,6 +10,7 @@ const init = {
 }
 const Cart_Context = React.createContext();
 export const CartProvider = ({ children }) => {
+    const [cartBuy, setCartBuy] = useState([]);
     const [state, dispatch] = useReducer(Cart_Reducer, init);
     const addToCart = (product) => {
         dispatch({ type: 'ADD_TO_CART', payload: product });
@@ -23,13 +24,12 @@ export const CartProvider = ({ children }) => {
     const removeItem = (id) => {
         dispatch({ type: 'REMOVE_ITEM', payload: id })
     };
-    useEffect(() => {
-        toast.success("Sản phẩm đã thêm vào giỏ hàng!");
-    }, [state.amount]);
+    const countCartTotals = () => {
+        dispatch({ type: 'COUNT_CART_TOTALS' });
+    }
     return (
-        <Cart_Context.Provider value={{ ...state, addToCart, increaseQuantity, decreaseQuantity, removeItem }}>
+        <Cart_Context.Provider value={{ ...state, cartBuy, setCartBuy, addToCart, increaseQuantity, decreaseQuantity, removeItem, countCartTotals }}>
             {children}
-            <ToastContainer position="top-right" autoClose={3000} />
         </Cart_Context.Provider>
     )
 }

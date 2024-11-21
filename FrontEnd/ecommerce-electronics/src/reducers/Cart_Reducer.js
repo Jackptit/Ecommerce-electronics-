@@ -42,7 +42,8 @@ const Cart_Reducer = (state, action) => {
             });
             return { ...state, cart: temp };
         case 'REMOVE_ITEM':
-            const newCart = state.cart.filter((item) => item.id !== action.payload.id);
+            const newCart = state.cart.filter((item) => item.id !== action.payload);
+            console.log(newCart)
             return { ...state, cart: newCart };
         case 'COUNT_CART_TOTALS':
             const { totalAmount, totalItem } = state.cart.reduce((total, item) => {

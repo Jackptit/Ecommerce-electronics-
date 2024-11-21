@@ -3,75 +3,52 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useCartContext } from '../contexts/Cart_Context';
 import CartItem from '../components/CartItem';
-
+import { Container, Row, Col, Button, Card } from "react-bootstrap";
 const CartPage = () => {
-    const { cart, total, amount } = useCartContext();
-    console.log(cart);
-    console.log(total);
-    console.log(amount);
-    return (
-        <Wrapper>
-            <div className="cart-container">
-                <h2>Giỏ hàng</h2>
-                <div className="cart-items">
-                    {cart.map((item) => (
-                        <CartItem key={item.id} item={item} />
-                    ))}
-                </div>
-                <Summary>
-                    <h3>Thanh toán</h3>
-                    <p>Tổng tạm tính: <span>{total.toLocaleString()}₫</span></p>
-                    <p>Thành tiền: <span>{total.toLocaleString()}₫</span> (Đã bao gồm VAT)</p>
-                    <button className="continue-button">Tiếp tục</button>
-                </Summary>
-            </div>
-        </Wrapper>
-    );
+  const { cart, total, amount } = useCartContext();
+  return (
+    <Container >
+      <h2 className="text-center mb-4">Giỏ hàng</h2>
+      <Row>
+
+        {/* Danh sách sản phẩm */}
+        <Col lg={8}>
+          <h5 className="mb-3">Sản phẩm trong giỏ</h5>
+          <Row className="fw-bold mb-2 bg-warning" >
+            <Col xs={6} className="text-center">Thông tin sản phẩm</Col>
+            <Col xs={2}>Đơn giá</Col>
+            <Col xs={2}>Số lượng</Col>
+            <Col xs={2}>Thành tiền</Col>
+            <Col xs={1}></Col> {/* Cột cho nút Xóa */}
+          </Row>
+          {cart.map((item) => (
+            <CartItem key={item.id} item={item} />
+          ))}
+        </Col>
+
+        {/* Tóm tắt thanh toán */}
+        <Col lg={4} className="mt-4">
+          <Card className="p-4 shadow-sm bg-light">
+            <h3 className="mb-3">Thanh toán</h3>
+            <p>
+              Tổng tạm tính: <span>{total.toLocaleString()}₫</span>
+            </p>
+            <p>
+              Thành tiền:{" "}
+              <span>
+                {total.toLocaleString()}₫ <small>(Đã bao gồm VAT)</small>
+              </span>
+            </p>
+            <Link to="/payment" className="text-decoration-none">
+              <Button variant="primary" className="w-100 mt-3" >
+                Tiếp tục
+              </Button>
+            </Link>
+          </Card>
+        </Col>
+      </Row >
+    </Container >
+  );
 };
 
 export default CartPage;
-
-const Wrapper = styled.div`
-    margin-top: 50px;
-  .cart-container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 1rem;
-    display: flex;
-    gap: 2rem;
-    background-color: white;
-  }
-  h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
-  .cart-items {
-    flex: 3;
-  }
-`;
-
-const Summary = styled.div`
-  flex: 1;
-  padding: 1rem;
-  background: #f7f7f7;
-  border-radius: 8px;
-  h3 {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-  }
-  p {
-    display: flex;
-    justify-content: space-between;
-    margin: 1rem 0;
-  }
-  .continue-button {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-`;

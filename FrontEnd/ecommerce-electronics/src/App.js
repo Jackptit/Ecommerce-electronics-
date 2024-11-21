@@ -1,5 +1,5 @@
 import "./App.css";
-import Navbar from "./components/Navbar";
+import NavbarComponent from "./components/Navbar";
 import {
   BrowserRouter as Router,
   Route,
@@ -12,10 +12,11 @@ import Footer from "./components/Footer";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
 import ChatBot from "react-chatbotify";
-import Login from "./components/Login";
 import Register from "./components/Register";
 import UserProfile from "./pages/UserProfilePage";
 import AdminPage from "./pages/Admin/AdminPage";
+import AuthForm from "./components/AuthForm";
+import PaymentPage from "./pages/PaymentPage";
 
 
 function App() {
@@ -42,8 +43,8 @@ function MainApp() {
     <>
       {!isExcluded && (
         <>
-          <Navbar settings={settings} />
-          <ChatBot />
+          <NavbarComponent settings={settings} />
+
         </>
       )}
 
@@ -52,9 +53,10 @@ function MainApp() {
         <Route path="/" element={<Home />} />
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<AuthForm />} />
         <Route path="/register" element={<Register />} />
         <Route path="/user-profile/*" element={<UserProfile />} />
+        <Route path="/payment" element={<PaymentPage />} />
 
         {/* Admin routes */}
         {/* <Route

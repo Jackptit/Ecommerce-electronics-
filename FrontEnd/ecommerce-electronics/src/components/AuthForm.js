@@ -1,59 +1,127 @@
 // src/components/AuthForm.js
 import React from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import { Button, Col, Container, Form, Row } from 'react-bootstrap';
+import "bootstrap/dist/css/bootstrap.min.css";
+import ImageBackground from '../assets/electronic.png'; // Import hình ảnh từ assets
+import { Link, useNavigate } from 'react-router-dom'; // Import Link từ react-router-dom
+import { useState } from 'react';
+import { useAuthContext } from '../contexts/Auth_Context';
+const AuthForm = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
+  const navigate = useNavigate();
+  const { setToken } = useAuthContext();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationErrors = {};
 
-const AuthForm = ({ isRegister, onSubmit }) => {
-  const initialValues = isRegister
-    ? { username: '', email: '', password: '', confirmPassword: '' }
-    : { email: '', password: '' };
+    if (!username) {
+      validationErrors.username = "Username is required";
+    }
 
-  const validationSchema = Yup.object().shape({
-    email: Yup.string().email('Email không hợp lệ').required('Vui lòng nhập email'),
-    password: Yup.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự').required('Vui lòng nhập mật khẩu'),
-    ...(isRegister && {
-      username: Yup.string().required('Vui lòng nhập tên người dùng'),
-      confirmPassword: Yup.string()
-        .oneOf([Yup.ref('password'), null], 'Mật khẩu không khớp')
-        .required('Vui lòng xác nhận mật khẩu'),
-    }),
-  });
+    if (!password) {
+      validationErrors.password = "Password is required";
+    }
 
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+    } else {
+      try {
+        const response = await fetch('http://localhost:8080/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ "phone": username, "password": password }),
+        }).then(response => response.json());
+        console.log(response);
+        setToken(response.accessToken);
+        if (response.accessToken !== undefined) {
+          navigate('/')
+        }
+        else if (response.status === 401) {
+          setServerError("Thông tin đăng nhập không chính xác.");
+        } else {
+          setServerError("Có lỗi xảy ra. Vui lòng thử lại.");
+        }
+      } catch (error) {
+        setServerError("Có lỗi xảy ra. Vui lòng thử lại.");
+      }
+    }
+  }
   return (
-    <div className="auth-form">
-      <h2>{isRegister ? 'Đăng ký' : 'Đăng nhập'}</h2>
-      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
-        {() => (
-          <Form>
-            {isRegister && (
-              <div>
-                <label>Tên người dùng</label>
-                <Field name="username" type="text" />
-                <ErrorMessage name="username" component="div" className="error" />
+
+    <Container fluid className="d-flex align-items-center justify-content-center min-vh-100 ">
+      <Row className="w-100" style={{ maxWidth: "900px" }}>
+        <Col md={6} className="d-flex align-items-center justify-content-center">
+          <img
+            src={ImageBackground}
+            alt="Login Illustration"
+            className="img-fluid"
+            style={{ maxHeight: "400px" }}
+          />
+        </Col>
+        <Col md={6} className="d-flex flex-column justify-content-center">
+          <h3 className="text-center mb-4">Đăng nhập</h3>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label>Tên đăng nhập</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Vui lòng nhập tên đăng nhập"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                isInvalid={!!errors.username}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.username}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formBasicPassword">
+              <Form.Label>Mật khẩu</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="hãy nhập mật khẩu"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                isInvalid={!!errors.password}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.password}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formBasicCheckbox">
+              <Form.Check type="checkbox" label="Remember me" />
+            </Form.Group>
+            {serverError && (
+              <div className="text-danger mb-3">
+                {serverError}
               </div>
             )}
-            <div>
-              <label>Email</label>
-              <Field name="email" type="email" />
-              <ErrorMessage name="email" component="div" className="error" />
-            </div>
-            <div>
-              <label>Mật khẩu</label>
-              <Field name="password" type="password" />
-              <ErrorMessage name="password" component="div" className="error" />
-            </div>
-            {isRegister && (
-              <div>
-                <label>Xác nhận mật khẩu</label>
-                <Field name="confirmPassword" type="password" />
-                <ErrorMessage name="confirmPassword" component="div" className="error" />
-              </div>
-            )}
-            <button type="submit">{isRegister ? 'Đăng ký' : 'Đăng nhập'}</button>
+            <Button variant="warning" type="submit" className="w-100 mb-3">
+              Đăng Nhập
+            </Button>
+
+            <div className="text-center mb-3">Hoặc</div>
+
+            <Button variant="primary" className="w-100 mb-2" style={{ backgroundColor: "#3b5998" }}>
+              <i className="fab fa-facebook-f"></i> Continue with Facebook
+            </Button>
+            <Button variant="info" className="w-100">
+              <i className="fab fa-google"></i> Continue with Google
+            </Button>
           </Form>
-        )}
-      </Formik>
-    </div>
+          <div className="text-center mt-3">
+            <div>Bạn chưa có tài khoản?
+              <Link to='/register'>Đăng ký ngay</Link></div>
+          </div>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

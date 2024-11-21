@@ -2,8 +2,17 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useCartContext } from '../contexts/Cart_Context';
+import { ToastContainer, toast } from 'react-toastify';
 const Product = (product) => {
-    const { addToCart } = useCartContext();
+    const { addToCart, countCartTotals } = useCartContext();
+    const handleBuyNow = () => {
+        // Gọi hàm addToCart (thêm sản phẩm vào giỏ hàng)
+        addToCart(product);
+        countCartTotals();
+
+        // Hiển thị thông báo toast
+        toast.success("Sản phẩm đã được thêm vào giỏ hàng!");
+    };
     return (
         <>
             <ProductWrapper>
@@ -15,17 +24,24 @@ const Product = (product) => {
                     <span className='w-tag'>256gb</span>
                     <footer>
                         <Link to={`/product/${product.id}`} className='link'>
-                            <h3 className='w-name'>{product.name}</h3>
+                            <p className='w-name' style={{
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                            }}>{product.name}</p>
                         </Link>
                         <p className='w-price'>{product.price}</p>
-                        <button className='buy-now' onClick={() => addToCart(product)}>Thêm vào giỏ hàng</button>
+                        <button className='buy-now' onClick={handleBuyNow}>Thêm vào giỏ hàng</button>
+
                     </footer>
                 </div>
             </ProductWrapper>
+
         </>
     );
 }
 const ProductWrapper = styled.article`
+    
     .container {
         border: 0.5px solid #f5f5f5;
         width: 200px;
@@ -60,7 +76,9 @@ const ProductWrapper = styled.article`
     }
     .w-name {
         opacity: 1; /* Đảm bảo .w-name luôn hiển thị */
-        
+        margin-bottom: 0.5rem; /* Đệm dưới 0.5rem */
+        font-size: 0.8rem; 
+       
     }
     .w-name:hover + .link{
         opacity: 1;
@@ -69,19 +87,20 @@ const ProductWrapper = styled.article`
     .w-price {
         color: red; /* Chữ màu đỏ */
         font-weight: bold;
+        /* Đệm trên 0.5rem */
     }
     .buy-now {
         background-color: #70d6f4; /* Màu nền xanh dương */
         color: black; /* Màu chữ trắng */
         border: none; /* Không viền */
       
-        padding: 10px 20px; /* Đệm trên dưới 10px, trái phải 20px */
+        padding: 8px 10px; /* Đệm trên dưới 10px, trái phải 20px */
         font-size: 1rem; /* Cỡ chữ */
         cursor: pointer; /* Con trỏ chuột khi di chuyển vào button */
         border-radius: 5px; /* Bo tròn góc */
         transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu nền */
         display: block; /* Đặt button thành block để margin:auto có tác dụng */
-    margin: 20px auto; /* Căn giữa button trên trục ngang */
+        margin: 10px auto; /* Căn giữa button trên trục ngang */
     }
 
     .buy-now:hover {

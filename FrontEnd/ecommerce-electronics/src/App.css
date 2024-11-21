@@ -38,7 +38,7 @@
   }
 }
 
-/* src/components/AuthForm.css */
+/* src/components/AuthForm.css
 .auth-form {
   max-width: 400px;
   margin: 50px auto;
@@ -78,7 +78,7 @@
 .auth-form .error {
   color: red;
   font-size: 12px;
-}
+} */
 
 
 
@@ -97,4 +97,3 @@
 .nav-pills .nav-link:hover {
   background-color: #f0f8ff;
 } */
-
