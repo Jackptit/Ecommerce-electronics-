@@ -1,0 +1,11 @@
+.custom-nav-link {
+    color: #000000;
+    /* Màu mặc định là đen */
+    transition: color 0.3s ease-in-out;
+    /* Tạo hiệu ứng chuyển đổi màu mượt */
+}
+
+.custom-nav-link:hover {
+    color: #d5d35a;
+    /* Đổi sang màu cam khi hover */
+}
