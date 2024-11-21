@@ -6,6 +6,8 @@ import ImageBackground from '../assets/electronic.png'; // Import hình ảnh t�
 import { Link, useNavigate } from 'react-router-dom'; // Import Link từ react-router-dom
 import { useState } from 'react';
 import { useAuthContext } from '../contexts/Auth_Context';
+import { useUserContext } from '../contexts/UserContext';
+
 const AuthForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -13,6 +15,9 @@ const AuthForm = () => {
   const [serverError, setServerError] = useState("");
   const navigate = useNavigate();
   const { setToken } = useAuthContext();
+  const { userState, dispatch, fetchUser } = useUserContext();
+
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = {};
@@ -39,6 +44,7 @@ const AuthForm = () => {
         console.log(response);
         setToken(response.accessToken);
         if (response.accessToken !== undefined) {
+          await fetchUser(response.accessToken);
           navigate('/')
         }
         else if (response.status === 401) {
@@ -47,6 +53,7 @@ const AuthForm = () => {
           setServerError("Có lỗi xảy ra. Vui lòng thử lại.");
         }
       } catch (error) {
+        console.log(error)
         setServerError("Có lỗi xảy ra. Vui lòng thử lại.");
       }
     }

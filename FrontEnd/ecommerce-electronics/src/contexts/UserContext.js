@@ -1,7 +1,14 @@
-import React, { createContext, useReducer, useContext, useEffect } from "react";
+import React, {
+  createContext,
+  useReducer,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import axios from "axios";
 import userReducer from "../reducers/userReducer";
 import { useAuthContext } from "./Auth_Context";
+
 const UserContext = createContext();
 
 // Initial state
@@ -13,43 +20,41 @@ const initialState = {
 
 // Provider component
 export const UserProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(userReducer, initialState);
+  const [userState, dispatch] = useReducer(userReducer, initialState);
   const { token } = useAuthContext();
-  console.log(`ở usercontext ${token}`);
+
   useEffect(() => {
-    // Kiểm tra nếu user chưa có và không có lỗi
-    console.log("useEffect đang chạy");
-    if (!state.user && !state.loading) {
-      dispatch({ type: "LOADING" }); // Đánh dấu đang tải dữ liệu
-      const fetchUser = async () => {
-        try {
-          const accessToken = token;
-          //localStorage.getItem("accessToken"); // Lấy accessToken từ localStorage
-          if (!accessToken) {
-            dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
-            return;
-          }
-
-          const response = await axios.get("http://localhost:8080/api/user", {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-          });
-
-          dispatch({ type: "SET_USER", payload: response.data }); // Lưu dữ liệu người dùng
-        } catch (error) {
-          console.error("Error fetching user:", error);
-          dispatch({ type: "ERROR", payload: error.message }); // Cập nhật lỗi vào state
-        }
-      };
-
-      fetchUser();
+    console.log('token', token)
+    // Kiểm tra nếu token hợp lệ và chưa có user trong state
+    if (token && !userState.user && !userState.loading) {
+      dispatch({ type: "LOADING" }); 
+      fetchUser(token);
     }
-  }, [state.user, state.loading]);
+  }, [userState.user, userState.loading]);
+
+  const fetchUser = async (accessToken) => {
+    try {
+      if (!accessToken) {
+        dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
+        return;
+      }
+
+      const response = await axios.get("http://localhost:8080/api/user", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      dispatch({ type: "SET_USER", payload: response.data });
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      dispatch({ type: "ERROR", payload: error.message });
+    }
+  };
 
   return (
-    <UserContext.Provider value={{ state, dispatch }}>
+    <UserContext.Provider value={{ userState, dispatch, fetchUser }}>
       {children}
     </UserContext.Provider>
   );

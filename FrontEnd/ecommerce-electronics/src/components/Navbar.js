@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faShoppingCart, faMapMarkerAlt, faMobileAlt, faSearch, faLaptop, faHeadphones, faTabletAlt, faDesktop, faClock, faRecycle } from '@fortawesome/free-solid-svg-icons';
@@ -8,7 +8,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useUserContext } from '../contexts/UserContext';
 import { useAuthContext } from '../contexts/Auth_Context';
 const NavbarComponent = () => {
-  const { user, dispatch } = useUserContext();
+  const { userState, dispatch } = useUserContext();
+  const [userData, setUserData] = useState(userState?.user);
   const { token } = useAuthContext();
 
   return (
@@ -59,10 +60,10 @@ const NavbarComponent = () => {
               {/* Login, Cart, Location */}
               <div className="d-flex align-items-center">
                 <>
-                  {user ?
+                  {userData ?
                     <>
                       <Button variant="warning" className="text-dark" as={Link} to="/user-profile">
-                        <FontAwesomeIcon icon={faUser} />{user.name}
+                        <FontAwesomeIcon icon={faUser} />{userData.username}
                       </Button>
                     </>
                     : <>
