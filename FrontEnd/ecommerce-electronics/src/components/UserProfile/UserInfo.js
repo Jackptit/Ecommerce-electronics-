@@ -4,25 +4,25 @@ import { toast } from "react-toastify"; // Import toast
 import formatDate from "../../utils/dateFormat";
 
 const UserInfo = () => {
-  const { state, dispatch } = useUserContext(); // Access state and dispatch from context
-  const [userData, setUserData] = useState(state?.user); // local state to manage the form
+  const { userState, dispatch } = useUserContext(); // Access state and dispatch from context
+  const [userData, setUserData] = useState(userState?.user); // local state to manage the form
 
   useEffect(() => {
     // Update userData if state.user changes
-    if (state.user) {
-      setUserData(state.user);
+    if (userState.user) {
+      setUserData(userState.user);
     }
-  }, [state.user]);
+  }, [userState.user]);
 
-  if (state.loading) {
+  if (userState.loading) {
     return <p>Loading user data...</p>;
   }
 
-  if (state.error) {
-    return <p>Error: {state.error}</p>;
+  if (userState.error) {
+    return <p>Error: {userState.error}</p>;
   }
 
-  if (!state.user) {
+  if (!userState.user) {
     return <p>No user data found.</p>;
   }
 
@@ -64,7 +64,7 @@ const UserInfo = () => {
               className="form-control"
               value={userData?.username || ""}
               onChange={handleChange}
-              disabled={!state.isEditing}
+              disabled={!userState.isEditing}
             />
           </div>
           <div className="mb-3">
@@ -75,7 +75,7 @@ const UserInfo = () => {
               className="form-control"
               value={userData?.email || ""}
               onChange={handleChange}
-              disabled={!state.isEditing}
+              disabled={!userState.isEditing}
             />
           </div>
           <div className="mb-3">
@@ -86,7 +86,7 @@ const UserInfo = () => {
               className="form-control"
               value={userData?.phone || ""}
               onChange={handleChange}
-              disabled={!state.isEditing}
+              disabled={!userState.isEditing}
             />
           </div>
           <div className="mb-3">
@@ -97,7 +97,7 @@ const UserInfo = () => {
               className="form-control"
               value={formatDate(userData?.birthday) || ""}
               onChange={handleChange}
-              disabled={!state.isEditing}
+              disabled={!userState.isEditing}
             />
           </div>
 
@@ -108,7 +108,7 @@ const UserInfo = () => {
               className="form-control"
               value={userData?.gender || ""}
               onChange={handleChange}
-              disabled={!state.isEditing}
+              disabled={!userState.isEditing}
             >
               <option value="Nam">Nam</option>
               <option value="Nữ">Nữ</option>
@@ -130,7 +130,7 @@ const UserInfo = () => {
             <button
               type="submit"
               className="btn btn-success"
-              disabled={!state?.isEditing}
+              disabled={!userState?.isEditing}
             >
               Cập nhật
             </button>
@@ -139,7 +139,7 @@ const UserInfo = () => {
               className="btn btn-outline-primary"
               onClick={handleEdit}
             >
-              {state.isEditing ? "Hủy" : "Chỉnh sửa"}
+              {userState.isEditing ? "Hủy" : "Chỉnh sửa"}
             </button>
           </div>
         </form>
