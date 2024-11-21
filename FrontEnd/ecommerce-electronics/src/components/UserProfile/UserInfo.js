@@ -1,10 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useUserContext } from "../../contexts/UserContext"; // Import context
 import { toast } from "react-toastify"; // Import toast
+import formatDate from "../../utils/dateFormat";
 
 const UserInfo = () => {
   const { state, dispatch } = useUserContext(); // Access state and dispatch from context
-  const [userData, setUserData] = useState(state.userInfo); // local state to manage the form
+  const [userData, setUserData] = useState(state?.user); // local state to manage the form
+
+  useEffect(() => {
+    // Update userData if state.user changes
+    if (state.user) {
+      setUserData(state.user);
+    }
+  }, [state.user]);
+
+  if (state.loading) {
+    return <p>Loading user data...</p>;
+  }
+
+  if (state.error) {
+    return <p>Error: {state.error}</p>;
+  }
+
+  if (!state.user) {
+    return <p>No user data found.</p>;
+  }
 
   // Toggle edit mode
   const handleEdit = () => {
@@ -27,10 +47,7 @@ const UserInfo = () => {
     toast.success("Cập nhật thông tin thành công!"); // Show success toast
   };
 
-  useEffect(() => {
-    // Sync form data with context
-    setUserData(state.userInfo);
-  }, [state.userInfo]);
+  
 
   return (
     <div className="card shadow-sm">
@@ -45,7 +62,7 @@ const UserInfo = () => {
               type="text"
               name="name"
               className="form-control"
-              value={userData.name}
+              value={userData?.username || ""}
               onChange={handleChange}
               disabled={!state.isEditing}
             />
@@ -56,7 +73,7 @@ const UserInfo = () => {
               type="email"
               name="email"
               className="form-control"
-              value={userData.email}
+              value={userData?.email || ""}
               onChange={handleChange}
               disabled={!state.isEditing}
             />
@@ -67,7 +84,7 @@ const UserInfo = () => {
               type="text"
               name="phone"
               className="form-control"
-              value={userData.phone}
+              value={userData?.phone || ""}
               onChange={handleChange}
               disabled={!state.isEditing}
             />
@@ -78,7 +95,7 @@ const UserInfo = () => {
               type="date"
               name="dateOfBirth"
               className="form-control"
-              value={userData.dateOfBirth}
+              value={formatDate(userData?.birthday) || ""}
               onChange={handleChange}
               disabled={!state.isEditing}
             />
@@ -89,7 +106,7 @@ const UserInfo = () => {
             <select
               name="gender"
               className="form-control"
-              value={userData.gender}
+              value={userData?.gender || ""}
               onChange={handleChange}
               disabled={!state.isEditing}
             >
@@ -98,22 +115,22 @@ const UserInfo = () => {
               <option value="Khác">Khác</option>
             </select>
           </div>
-          <div className="mb-3">
+          {/* <div className="mb-3">
             <label className="form-label"><strong>Địa chỉ:</strong></label>
             <input
               type="text"
               name="address"
               className="form-control"
-              value={userData.address}
+              value={userData?.address || ""}
               onChange={handleChange}
               disabled={!state.isEditing}
             />
-          </div>
+          </div> */}
           <div className="d-flex justify-content-center gap-3">
             <button
               type="submit"
               className="btn btn-success"
-              disabled={!state.isEditing}
+              disabled={!state?.isEditing}
             >
               Cập nhật
             </button>

@@ -9,8 +9,10 @@ import { ToastContainer } from "react-toastify"; // Import ToastContainer
 import "../components/UserProfile/UserProfile.css";
 import 'react-toastify/dist/ReactToastify.css'; // Import CSS for react-toastify
 // import "bootstrap/dist/css/bootstrap.min.css";
+import { useUserContext } from "../contexts/UserContext";
 
 const UserProfile = () => {
+  const { state, dispatch } = useUserContext();
   return (
     //<UserProvider>
       <div className="container mt-4 user-profile">
