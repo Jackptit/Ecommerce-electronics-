@@ -46,7 +46,7 @@ export const UserProvider = ({ children }) => {
 
       fetchUser();
     }
-  }, [state.user, state.loading]);
+  }, [state.user, state.loading, token]);
 
   return (
     <UserContext.Provider value={{ state, dispatch }}>

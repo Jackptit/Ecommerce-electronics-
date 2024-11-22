@@ -1,6 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import ProductImage from "../components/ProductImage";
+import UserComment from "../components/UserComment";
+import { Container, Button } from "react-bootstrap";
+import ModalComment from "../components/ModalComment";
 const ProductPage = () => {
   const product = {
     name: "Màn hình LCD Xiaomi G27i EU ELA5375EU 27 inch (1920x1080/ IPS/ 165Hz/ 1ms)",
@@ -17,6 +20,17 @@ const ProductPage = () => {
                 - HIển thị màu sắc: 16.7 triệu màu
                 - Cổng hình ảnh: 1 x DisplayPort, 1 x HDMI 2.0`,
   }
+  const list_commnent = [
+    {
+      avatar: "https://img.freepik.com/premium-vector/avatar-icon0002_750950-43.jpg",
+      userName: "Nguyễn Hoàng Nam",
+      rating: 4,
+      comment: "Sản phẩm như bìu, giá cả hợp lý"
+    }
+  ]
+  const [showModal, setShowModal] = React.useState(false);
+  const handleShowModal = () => { setShowModal(true) };
+  const handleCloseModal = () => { setShowModal(false) };
   return (
     <Wrapper>
       <div className="product-center">
@@ -35,6 +49,15 @@ const ProductPage = () => {
             <p>{product.detail}</p>
           </div>
         </section>
+        <Container>
+          <Button variant="danger" className="mb-4" onClick={handleShowModal}>
+            Đánh giá ngay
+          </Button>
+          <ModalComment show={showModal} handleClose={handleCloseModal} />
+          {list_commnent.map((item, index) =>
+            <UserComment key={index} props={item} />)
+          }
+        </Container>
       </div>
     </Wrapper>
   )
@@ -43,7 +66,7 @@ const Wrapper = styled.section`
   padding: 2rem;
   display: flex;
   justify-content: center;
-
+  
   .product-center {
     display: grid;
     grid-template-columns: 1fr 1fr;
