@@ -10,6 +10,7 @@ import { AuthProvider } from "./contexts/Auth_Context";
 import { CartProvider } from "./contexts/Cart_Context";
 import { UserProvider } from "./contexts/UserContext";
 import { AddressProvider } from "./contexts/AddressContext";
+import { OrdersProvider } from "./contexts/OrderContext";
 import { ToastContainer, toast } from "react-toastify";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -17,10 +18,12 @@ root.render(
     <AuthProvider>
       <AddressProvider>
         <UserProvider>
-          <CartProvider>
-            <App />
-            <ToastContainer />
-          </CartProvider>
+          <OrdersProvider>
+            <CartProvider>
+              <App />
+              <ToastContainer />
+            </CartProvider>
+          </OrdersProvider>
         </UserProvider>
       </AddressProvider>
     </AuthProvider>

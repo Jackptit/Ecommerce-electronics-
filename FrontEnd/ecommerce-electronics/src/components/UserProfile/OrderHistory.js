@@ -1,53 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import { useOrdersContext } from "../../contexts/OrderContext"; // Import context
+import { toast } from "react-toastify"; // Import toast
+import formatDate from "../../utils/dateFormat";
+import { getAccessToken } from "../../utils/commonFunction";
 
 const OrderHistory = () => {
-  // Dữ liệu mẫu
-  const orders = [
-    {
-      id: "ORD001",
-      date: "2024-11-15",
-      total: 500000,
-      status: "Đã giao hàng",
-      items: [
-        {
-          name: "Điện thoại Iphone 16 Promax",
-          quantity: 2,
-          price: 100000,
-          image:
-            "https://lh3.googleusercontent.com/KGkAbtWwoyPn6hccimhAO97T6lLYZ7N443dopw168t3dQh0F4ehNjShwp30yT2kkuzYyjg0Dl1tWM24PuJ6mvEBxSVj7V11mEQ=w500-rw",
-          feedback: false,
-        },
-        {
-          name: "Điện thoại Samsum Galaxy S22 Ultra",
-          quantity: 1,
-          price: 300000,
-          image:
-            "https://lh3.googleusercontent.com/KGkAbtWwoyPn6hccimhAO97T6lLYZ7N443dopw168t3dQh0F4ehNjShwp30yT2kkuzYyjg0Dl1tWM24PuJ6mvEBxSVj7V11mEQ=w500-rw",
-          feedback: false,
-        },
-      ],
-    },
-    {
-      id: "ORD002",
-      date: "2024-11-10",
-      total: 300000,
-      status: "Đang vận chuyển",
-      items: [
-        {
-          name: "Màn hình LCD Xiaomi G27i EU ELA5375EU 27 inch (1920x1080/ IPS/ 165Hz/ 1ms) ",
-          quantity: 1,
-          price: 300000,
-          image:
-            "https://lh3.googleusercontent.com/KGkAbtWwoyPn6hccimhAO97T6lLYZ7N443dopw168t3dQh0F4ehNjShwp30yT2kkuzYyjg0Dl1tWM24PuJ6mvEBxSVj7V11mEQ=w500-rw",
-          feedback: true,
-        },
-      ],
-    },
-  ];
+  const { ordersState, dispatch, fetchOrders } = useOrdersContext();
+  const [ordersData, setOrders] = useState(ordersState?.orders);
+  const token = getAccessToken();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+
+  useEffect(() => {
+    if (ordersState.orders) {
+      setOrders(ordersState.orders);
+    }
+  }, [ordersState.orders]);
+
+  useEffect(() => {
+    if (!token) return;
+    const fetchData = async () => {
+      await fetchOrders(token);
+    };
+
+    fetchData();
+  }, [token]);
+
+  if (ordersState.loading) {
+    return <p>Loading user data...</p>;
+  }
+
+  if (ordersState.error) {
+    return <p>Error: {ordersState.error}</p>;
+  }
+
+  if (!ordersState.orders) {
+    return <p>No user data found.</p>;
+  }
 
   const handleReviewClick = (item) => {
     setSelectedItem(item); // Lưu thông tin sản phẩm được chọn
@@ -66,25 +57,50 @@ const OrderHistory = () => {
     handleCloseModal();
   };
 
+  const convertStatus = (status) => {
+    return status == 1
+      ? "Đã thanh toán"
+      : status == 2
+      ? "Chờ thanh toán"
+      : "Đã Hủy";
+  };
+
   return (
     <div>
       <h3 className="mb-4">Lịch sử mua sắm</h3>
-      {orders.map((order) => (
+      {ordersData?.map((order) => (
         <div key={order.id} className="card mb-3">
           <div className="card-header d-flex justify-content-between align-items-center">
             <span>
-              <strong>Mã đơn hàng:</strong> {order.id}
+              <strong>Mã đơn hàng:</strong> {order.code}
             </span>
             <span>
-              <strong>Ngày mua:</strong> {order.date}
+              <strong>Ngày mua:</strong> {formatDate(order.orderTime)}
             </span>
           </div>
           <div className="card-body">
             <p>
-              <strong>Tổng tiền:</strong> {order.total.toLocaleString("vi-VN")}₫
+              <strong>
+                Tổng tiền: {order.total.toLocaleString("vi-VN")} ₫
+              </strong>
             </p>
             <p>
-              <strong>Trạng thái:</strong> {order.status}
+              <strong>Trạng thái:</strong>
+              <span
+                style={{
+                  color:
+                    order.status === 1
+                      ? "green"
+                      : order.status === 2
+                      ? "gray"
+                      : "red",
+                  marginLeft: "10px",
+                }}
+              >
+                <strong>
+                  <i>{convertStatus(order.status)}</i>
+                </strong>
+              </span>
             </p>
             <table className="table">
               <thead>
@@ -97,12 +113,12 @@ const OrderHistory = () => {
                 </tr>
               </thead>
               <tbody>
-                {order.items.map((item, index) => (
+                {order.orderDetails.map((item, index) => (
                   <tr key={index}>
                     <td>
                       <img
-                        src={item.image}
-                        alt={item.name}
+                        src={item.product.image}
+                        alt={"image"}
                         style={{
                           width: "50px",
                           height: "50px",
@@ -111,9 +127,9 @@ const OrderHistory = () => {
                         }}
                       />
                     </td>
-                    <td className="fixed-width">{item.name}</td>
+                    <td className="fixed-width">{item.product.name}</td>
                     <td>{item.quantity}</td>
-                    <td>{item.price.toLocaleString("vi-VN")}₫</td>
+                    <td>{item.productPrice.toLocaleString("vi-VN")} ₫</td>
                     <td>
                       {item.feedback ? (
                         <span className="feedback-checked">Đã đánh giá</span>

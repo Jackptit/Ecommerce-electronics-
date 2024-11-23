@@ -57,7 +57,7 @@ export const AddressProvider = ({ children }) => {
     }
   };
 
-  const updateAddress = async (address) => {
+  const updateAddress = async (address, setIsDefault = false) => {
     try {
       if (!token) {
         dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
@@ -76,7 +76,10 @@ export const AddressProvider = ({ children }) => {
         }
       );
 
-      dispatch({ type: "SET_ADDRESS", payload: response.data });
+      if(setIsDefault)
+        dispatch({ type: "UPDATE_DEFAULT_ADDRESS", payload: response.data });
+      else
+        dispatch({ type: "UPDATE_ADDRESS", payload: response.data });
       return response;
     } catch (error) {
       console.error("Error updating address:", error);
@@ -84,9 +87,64 @@ export const AddressProvider = ({ children }) => {
     }
   };
 
+
+  const addAddress = async (address) => {
+    try {
+    console.log(token)
+      if (!token) {
+        dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
+        return;
+      }
+  
+      dispatch({ type: "LOADING" });
+  
+      const response = await axios.post(
+        "http://localhost:8080/api/address", 
+        address,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      dispatch({ type: "ADD_ADDRESS", payload: response.data });
+     
+      return response; // Trả về response từ API
+    } catch (error) {
+      console.error("Error adding address:", error);
+      dispatch({ type: "ERROR", payload: error.message });
+    }
+  };
+  
+  const deleteAddress = async (id) => {
+    try {
+      if (!token) {
+        dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
+        return;
+      }
+  
+      const response = await axios.delete(`http://localhost:8080/api/address/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+  
+      // Xóa địa chỉ thành công, cập nhật lại danh sách địa chỉ
+      dispatch({ type: "DELETE_ADDRESS", payload: id });
+    } catch (error) {
+      console.error("Error deleting address:", error);
+      dispatch({ type: "ERROR", payload: error.message });
+    }
+  };
+  
+  
+
   return (
     <AddressContext.Provider
-      value={{ addressState, dispatch, fetchAddress, updateAddress }}
+      value={{ addressState, dispatch, fetchAddress, updateAddress, addAddress, deleteAddress}}
     >
       {children}
     </AddressContext.Provider>
