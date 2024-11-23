@@ -1,4 +1,5 @@
 import "./App.css";
+import { useEffect, useState } from "react";
 import NavbarComponent from "./components/Navbar";
 import {
   BrowserRouter as Router,
@@ -17,7 +18,8 @@ import UserProfile from "./pages/UserProfilePage";
 import AdminPage from "./pages/Admin/AdminPage";
 import AuthForm from "./components/AuthForm";
 import PaymentPage from "./pages/PaymentPage";
-
+import { getAccessToken } from "./utils/commonFunction";
+import { useUserContext } from "./contexts/UserContext";
 
 function App() {
   return (
@@ -28,6 +30,27 @@ function App() {
 }
 
 function MainApp() {
+  const { userState, dispatch, fetchUser } = useUserContext();
+  const [userData, setUserData] = useState(userState?.user);
+
+  useEffect(() => {
+    const token = getAccessToken();
+    const fetchUserData = async () => {
+      if (token && !userState.user && !userState.loading) {
+        console.log("Fetching user...");
+        await fetchUser(token);
+      }
+    };
+    
+    fetchUserData(); // Gọi hàm async
+  }, [userState.user, userState.loading]);
+
+  useEffect(() => {
+    if (userState.user) {
+      setUserData(userState.user);
+    }
+  }, [userState.user]);
+
   const settings = {
     avatar:
       "https://inkythuatso.com/uploads/thumbnails/800/2021/10/logo-messenger-inkythuatso-2-01-30-15-48-06.jpg",
@@ -38,7 +61,7 @@ function MainApp() {
   const isExcluded = excludedRoutes.some((route) =>
     location.pathname.includes(route)
   );
-  const isAdmin = true;
+  const isAdmin = userData?.idRole == 1 ? true : false;
   return (
     <>
       {!isExcluded && (
@@ -65,7 +88,7 @@ function MainApp() {
       /> */}
         <Route
           path="/admin/*"
-          element={isAdmin ? <AdminPage /> : <Navigate to="/login" />}
+          element={userData?.idRole == 2 ? <AdminPage /> : <Navigate to="/login" />}
         />
       </Routes>
       {!isExcluded && (

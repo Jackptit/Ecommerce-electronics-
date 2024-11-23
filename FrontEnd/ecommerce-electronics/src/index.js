@@ -2,24 +2,27 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import 'react-toastify/dist/ReactToastify.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import "react-toastify/dist/ReactToastify.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { AuthProvider } from "./contexts/Auth_Context";
 import { CartProvider } from "./contexts/Cart_Context";
 import { UserProvider } from "./contexts/UserContext";
-import { ToastContainer, toast } from 'react-toastify';
+import { AddressProvider } from "./contexts/AddressContext";
+import { ToastContainer, toast } from "react-toastify";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <UserProvider>
-        <CartProvider>
-          <App />
-          <ToastContainer />
-        </CartProvider>
-      </UserProvider>
+      <AddressProvider>
+        <UserProvider>
+          <CartProvider>
+            <App />
+            <ToastContainer />
+          </CartProvider>
+        </UserProvider>
+      </AddressProvider>
     </AuthProvider>
   </React.StrictMode>
 );
