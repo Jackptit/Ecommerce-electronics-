@@ -4,8 +4,9 @@ import { toast } from "react-toastify"; // Import toast
 import formatDate from "../../utils/dateFormat";
 
 const UserInfo = () => {
-  const { userState, dispatch } = useUserContext(); // Access state and dispatch from context
-  const [userData, setUserData] = useState(userState?.user); // local state to manage the form
+  const { userState, dispatch, updateUser } = useUserContext();
+  const [userData, setUserData] = useState(userState?.user);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     // Update userData if state.user changes
@@ -28,26 +29,38 @@ const UserInfo = () => {
 
   // Toggle edit mode
   const handleEdit = () => {
-    dispatch({ type: "TOGGLE_EDIT_MODE" });
+    setIsEditing(true);
   };
 
-  // Handle form changes
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    const genderValue = value === "Nam" ? 1 : value === "Nữ" ? 2 : 3;
+
     setUserData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: name === "gender" ? genderValue : value,
     }));
   };
 
   // Handle submit (update user information)
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch({ type: "UPDATE_USER_INFO", payload: userData });
-    toast.success("Cập nhật thông tin thành công!"); // Show success toast
-  };
 
-  
+    try {
+      const result = await updateUser(userData);
+      if (result.status == 200) {
+        toast.success("Cập nhật thông tin thành công!");
+      } else {
+        toast.error("Cập nhật thông tin thất bại!");
+      }
+      setIsEditing(false);
+    } catch (error) {
+      setIsEditing(false);
+      console.error("Unexpected error:", error);
+      toast.error("Đã xảy ra lỗi. Vui lòng thử lại sau!");
+    }
+  };
 
   return (
     <div className="card shadow-sm">
@@ -57,58 +70,76 @@ const UserInfo = () => {
       <div className="card-body">
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="form-label"><strong>Họ và Tên:</strong></label>
+            <label className="form-label">
+              <strong>Họ và Tên:</strong>
+            </label>
             <input
               type="text"
-              name="name"
+              name="username"
               className="form-control"
               value={userData?.username || ""}
               onChange={handleChange}
-              disabled={!userState.isEditing}
+              disabled={!isEditing}
             />
           </div>
           <div className="mb-3">
-            <label className="form-label"><strong>Email:</strong></label>
+            <label className="form-label">
+              <strong>Email:</strong>
+            </label>
             <input
               type="email"
               name="email"
               className="form-control"
               value={userData?.email || ""}
               onChange={handleChange}
-              disabled={!userState.isEditing}
+              disabled={true}
             />
           </div>
           <div className="mb-3">
-            <label className="form-label"><strong>Số điện thoại:</strong></label>
+            <label className="form-label">
+              <strong>Số điện thoại:</strong>
+            </label>
             <input
               type="text"
               name="phone"
               className="form-control"
               value={userData?.phone || ""}
               onChange={handleChange}
-              disabled={!userState.isEditing}
+              disabled={!isEditing}
             />
           </div>
           <div className="mb-3">
-            <label className="form-label"><strong>Ngày sinh:</strong></label>
+            <label className="form-label">
+              <strong>Ngày sinh:</strong>
+            </label>
             <input
               type="date"
-              name="dateOfBirth"
+              name="birthday"
               className="form-control"
               value={formatDate(userData?.birthday) || ""}
               onChange={handleChange}
-              disabled={!userState.isEditing}
+              disabled={!isEditing}
             />
           </div>
 
           <div className="mb-3">
-            <label className="form-label"><strong>Giới tính:</strong></label>
+            <label className="form-label">
+              <strong>Giới tính:</strong>
+            </label>
             <select
               name="gender"
               className="form-control"
-              value={userData?.gender || ""}
+              value={
+                userData?.gender === 1
+                  ? "Nam"
+                  : userData?.gender === 2
+                  ? "Nữ"
+                  : userData?.gender === 3
+                  ? "Khác"
+                  : ""
+              }
               onChange={handleChange}
-              disabled={!userState.isEditing}
+              disabled={!isEditing}
             >
               <option value="Nam">Nam</option>
               <option value="Nữ">Nữ</option>
@@ -130,7 +161,7 @@ const UserInfo = () => {
             <button
               type="submit"
               className="btn btn-success"
-              disabled={!userState?.isEditing}
+              disabled={!isEditing}
             >
               Cập nhật
             </button>
@@ -139,7 +170,7 @@ const UserInfo = () => {
               className="btn btn-outline-primary"
               onClick={handleEdit}
             >
-              {userState.isEditing ? "Hủy" : "Chỉnh sửa"}
+              {"Chỉnh sửa"}
             </button>
           </div>
         </form>

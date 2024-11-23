@@ -5,8 +5,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import ImageBackground from '../assets/electronic.png'; // Import hình ảnh từ assets
 import { Link, useNavigate } from 'react-router-dom'; // Import Link từ react-router-dom
 import { useState } from 'react';
+import { saveAccessToken } from '../utils/commonFunction';
+
 import { useAuthContext } from '../contexts/Auth_Context';
 import { useUserContext } from '../contexts/UserContext';
+import { useAddressContext } from '../contexts/AddressContext';
 
 const AuthForm = () => {
   const [username, setUsername] = useState("");
@@ -14,10 +17,10 @@ const AuthForm = () => {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const navigate = useNavigate();
-  const { setToken } = useAuthContext();
-  const { userState, dispatch, fetchUser } = useUserContext();
 
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const { userState, fetchUser } = useUserContext();
+  const { addressState, fetchAddress } = useAddressContext();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = {};
@@ -41,10 +44,11 @@ const AuthForm = () => {
           },
           body: JSON.stringify({ "phone": username, "password": password }),
         }).then(response => response.json());
-        console.log(response);
-        setToken(response.accessToken);
+        
+        saveAccessToken(response.accessToken); //save token to localstored
+
         if (response.accessToken !== undefined) {
-          await fetchUser(response.accessToken);
+          handleGetUserData(response.accessToken);
           navigate('/')
         }
         else if (response.status === 401) {
@@ -57,6 +61,11 @@ const AuthForm = () => {
         setServerError("Có lỗi xảy ra. Vui lòng thử lại.");
       }
     }
+  }
+
+  const handleGetUserData = async(accessToken ) =>{
+    await fetchUser(accessToken);
+    await fetchAddress(accessToken);
   }
   return (
 
