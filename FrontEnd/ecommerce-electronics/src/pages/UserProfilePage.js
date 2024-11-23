@@ -12,7 +12,7 @@ import 'react-toastify/dist/ReactToastify.css'; // Import CSS for react-toastify
 import { useUserContext } from "../contexts/UserContext";
 
 const UserProfile = () => {
-  const { state, dispatch } = useUserContext();
+  const { userState, dispatch } = useUserContext();
   return (
     //<UserProvider>
       <div className="container mt-4 user-profile">
@@ -47,7 +47,7 @@ const UserProfile = () => {
           {/* Content */}
           <div className="col-md-9 content">
             <Routes>
-              <Route index element={<Navigate to="user-info" replace />} />
+              <Route index element={userState.user ? <Navigate to="user-info" replace /> : <Navigate to="/login" replace />} />
               <Route path="user-info" element={<UserInfo />} />
               <Route path="address-list" element={<AddressList />} />
               <Route path="order-history" element={<OrderHistory />} />
