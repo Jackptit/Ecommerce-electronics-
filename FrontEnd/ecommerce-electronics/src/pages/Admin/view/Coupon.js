@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import {  useNavigate } from "react-router-dom";
 import DiscountModal from '../../../components/AdminComponents/Modal/DiscountModal';
+import { getAccessToken } from "../../../utils/commonFunction";
+import axios from 'axios';
+import formatDate from '../../../utils/dateFormat';
 
 const CouponManagement = () => {
+  const navigate = useNavigate();
+  const token = getAccessToken();
   const [showModal, setShowModal] = useState(false);
   const [currentCoupon, setCurrentCoupon] = useState({
     id: '',
@@ -14,20 +20,33 @@ const CouponManagement = () => {
   
   const [searchTerm, setSearchTerm] = useState('');
   const [coupons, setCoupons] = useState([
-    { id: 1, name: 'Giảm giá Tết', code: 'TET2024', discount: 10, startDate: '2024-01-01', endDate: '2024-01-31' },
-    { id: 2, name: 'SALE10', code: 'SALE10', discount: 10, quantity: 100, startDate: '2024-11-01', endDate: '2024-11-30' },
-    { id: 3, name: 'BLACKFRIDAY', code: 'BF2024', discount: 50, quantity: 50, startDate: '2024-11-25', endDate: '2024-11-30' },
-    { id: 4, name: 'BLACKFRIDAY', code: 'BF2024', discount: 50, quantity: 50, startDate: '2024-11-25', endDate: '2024-11-30' },
-    { id: 5, name: 'BLACKFRIDAY', code: 'BF2024', discount: 50, quantity: 50, startDate: '2024-11-25', endDate: '2024-11-30' },
-    { id: 6, name: 'BLACKFRIDAY', code: 'BF2024', discount: 50, quantity: 50, startDate: '2024-11-25', endDate: '2024-11-30' },
-    { id: 7, name: 'BLACKFRIDAY', code: 'BF2024', discount: 50, quantity: 50, startDate: '2024-11-25', endDate: '2024-11-30' },
-    { id: 8, name: 'BLACKFRIDAY', code: 'BF2024', discount: 50, quantity: 50, startDate: '2024-11-25', endDate: '2024-11-30' },
-    { id: 9, name: 'BLACKFRIDAY', code: 'BF2024', discount: 50, quantity: 50, startDate: '2024-11-25', endDate: '2024-11-30' },
-    { id: 10, name: 'BLACKFRIDAY', code: 'BF2024', discount: 50, quantity: 50, startDate: '2024-11-25', endDate: '2024-11-30' },
-    { id: 11, name: 'BLACKFRIDAY', code: 'BF2024', discount: 50, quantity: 50, startDate: '2024-11-25', endDate: '2024-11-30' },
-    { id: 12, name: 'BLACKFRIDAY', code: 'BF2024', discount: 50, quantity: 50, startDate: '2024-11-25', endDate: '2024-11-30' },
-    { id: 13, name: 'BLACKFRIDAY', code: 'BF2024', discount: 50, quantity: 50, startDate: '2024-11-25', endDate: '2024-11-30' },
+    
   ]);
+
+  useEffect(() => {
+    fetchCoupon();
+  }, []);
+
+  const fetchCoupon = async () => {
+    try {
+      if (!token) {
+        //dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
+        return;
+      }
+      const coupons = await axios.get("http://localhost:8080/api/coupon", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setCoupons(coupons.data);
+    } catch (error) {
+      console.log("Error fetching coupon:", error.status);
+      if(error.status === 401){
+        navigate('/login');
+      }
+    }
+  };
 
   const handleInputChange = (e, setCoupon) => {
     const { name, value } = e.target;
@@ -55,9 +74,9 @@ const CouponManagement = () => {
   };
 
   const handleSave = (coupon) => {
-    if (coupon.id) {
+    if (coupon.id) { //edit
       setCoupons((prev) => prev.map((c) => (c.id === coupon.id ? coupon : c)));
-    } else {
+    } else {  //add new
       setCoupons((prev) => [...prev, { ...coupon, id: Date.now() }]);
     }
     setShowModal(false);
@@ -116,10 +135,11 @@ const CouponManagement = () => {
           <tr>
             <th>#</th>
             <th>Tên mã</th>
-            <th>Mã</th>
-            <th>Giảm giá</th>
+            <th>Mã Code</th>
+            <th>Giảm giá (%)</th>
             <th>Ngày bắt đầu</th>
             <th>Ngày kết thúc</th>
+            <th>Số lượng</th>
             <th>Hành động</th>
           </tr>
         </thead>
@@ -129,9 +149,10 @@ const CouponManagement = () => {
               <td>{index + 1}</td>
               <td>{coupon.name}</td>
               <td>{coupon.code}</td>
-              <td>{coupon.discount}</td>
-              <td>{coupon.startDate}</td>
-              <td>{coupon.endDate}</td>
+              <td>{coupon.discountPercent}</td>
+              <td>{formatDate(coupon.startTime)}</td>
+              <td>{formatDate(coupon.endTime)}</td>
+              <td>{coupon.quantity}</td>
               <td>
                 <button className="btn btn-warning btn-sm me-2" onClick={() => handleEdit(coupon)}>
                   Sửa
