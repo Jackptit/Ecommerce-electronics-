@@ -6,12 +6,15 @@ import formatDate from "../../utils/dateFormat";
 import { getAccessToken } from "../../utils/commonFunction";
 
 const OrderHistory = () => {
-  const { ordersState, dispatch, fetchOrders } = useOrdersContext();
+  const { ordersState, dispatch, fetchOrders, updateFeedbackStatus } = useOrdersContext();
   const [ordersData, setOrders] = useState(ordersState?.orders);
   const token = getAccessToken();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+
+  const [review, setReview] = useState("");
+  const [rating, setRating] = useState("");
 
   useEffect(() => {
     if (ordersState.orders) {
@@ -48,12 +51,31 @@ const OrderHistory = () => {
   const handleCloseModal = () => {
     setSelectedItem(null);
     setShowModal(false);
+    setReview("");
+    setRating("");
   };
 
-  const handleSubmitReview = (e) => {
+  const handleReviewChange = (e) => {
+    setReview(e.target.value);
+  };
+
+  const handleRatingChange = (e) => {
+    setRating(e.target.value);
+  };
+
+
+  
+
+  const handleSubmitReview = async (e) => {
     e.preventDefault();
-    console.log("Đánh giá sản phẩm:", selectedItem.name);
-    // Gửi đánh giá lên server tại đây
+
+    const reviewData = {
+      idProduct: selectedItem?.product.id, 
+      star: rating,
+      description: review,
+    };
+
+    await updateFeedbackStatus(token, reviewData, selectedItem?.idOrder, selectedItem?.idProduct);
     handleCloseModal();
   };
 
@@ -117,7 +139,7 @@ const OrderHistory = () => {
                   <tr key={index}>
                     <td>
                       <img
-                        src={item.product.image}
+                        src={"https:" + item.product.image.split(",")[1]}
                         alt={"image"}
                         style={{
                           width: "50px",
@@ -131,7 +153,7 @@ const OrderHistory = () => {
                     <td>{item.quantity}</td>
                     <td>{item.productPrice.toLocaleString("vi-VN")} ₫</td>
                     <td>
-                      {item.feedback ? (
+                      {item.isFeedback ? (
                         <span className="feedback-checked">Đã đánh giá</span>
                       ) : (
                         <Button
@@ -164,22 +186,32 @@ const OrderHistory = () => {
               <Form.Control
                 type="text"
                 readOnly
-                value={selectedItem?.name || ""}
+                value={selectedItem?.product.name || ""}
               />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Đánh giá</Form.Label>
-              <Form.Control as="textarea" rows={3} required />
+              <Form.Control
+                as="textarea"
+                rows={3}
+                required
+                value={review}
+                onChange={handleReviewChange}
+              />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Xếp hạng</Form.Label>
-              <Form.Select required>
+              <Form.Select
+                required
+                value={rating}
+                onChange={handleRatingChange}
+              >
                 <option value="">Chọn xếp hạng</option>
                 <option value="1">1 ⭐- Tệ</option>
-                <option value="2">2 ⭐- Không tốt</option>
-                <option value="3">3 ⭐- Bình thường</option>
-                <option value="4">4 ⭐- Tốt</option>
-                <option value="5">5 ⭐- Xuất sắc</option>
+                <option value="2">2 ⭐⭐- Không tốt</option>
+                <option value="3">3 ⭐⭐⭐- Bình thường</option>
+                <option value="4">4 ⭐⭐⭐⭐- Tốt</option>
+                <option value="5">5 ⭐⭐⭐⭐⭐- Xuất sắc</option>
               </Form.Select>
             </Form.Group>
             <Button variant="success" type="submit">

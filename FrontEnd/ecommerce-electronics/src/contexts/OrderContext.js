@@ -8,6 +8,7 @@ import React, {
 import axios from "axios";
 import { getAccessToken } from "../utils/commonFunction";
 import orderReducer from "../reducers/OrderReducer";
+import { toast } from "react-toastify"; //
 
 const OrderContext = createContext();
 
@@ -68,7 +69,7 @@ export const OrdersProvider = ({ children }) => {
         })
       );
 
-      console.log("Orders", ordersWithDetails)
+      console.log("Orders", ordersWithDetails);
       dispatch({ type: "SET_ORDERS", payload: ordersWithDetails });
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -76,8 +77,65 @@ export const OrdersProvider = ({ children }) => {
     }
   };
 
+  const updateFeedbackStatus = async (accesstoken, reviewData, idOrder, idProduct) => {
+    try {
+      if (!accesstoken) {
+        dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
+        return;
+      }
+
+      // create feedback
+      const response = await axios.post(
+        "http://127.0.0.1:8080/api/feedback",
+        reviewData,
+        {
+          headers: {
+            Authorization: `Bearer ${accesstoken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status !== 200) {
+        dispatch({ type: "ERROR", payload: response.message });
+        toast.error("Đánh giá sản phẩm thất bại!");
+        return;
+      }
+
+      //set status feedback = true
+      const orderInfo = {
+        idOrder: idOrder,
+        idProduct: idProduct,
+      };
+      const feedbackStatus = await axios.put(
+        "http://127.0.0.1:8080/api/order_detail",
+        orderInfo,
+        {
+          headers: {
+            Authorization: `Bearer ${accesstoken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (feedbackStatus.status === 200) {
+        toast.success("Đánh giá sản phẩm thành công!");
+        dispatch({ type: "FEEDBACK_ORDER_PRODUCT", payload: orderInfo });
+        console.log("Thất bại khi update status");
+      } else {
+        toast.error("Đánh giá sản phẩm thất bại!");
+        dispatch({ type: "ERROR", payload: feedbackStatus.message });
+      }
+      
+    } catch (error) {
+      console.log("Error feedback orders:", error);
+      dispatch({ type: "ERROR", payload: error.message });
+      toast.error("Đánh giá sản phẩm thất bại!");
+    }
+  };
+
   return (
-    <OrderContext.Provider value={{ ordersState, dispatch, fetchOrders }}>
+    <OrderContext.Provider value={{ ordersState, dispatch, fetchOrders, updateFeedbackStatus }}>
       {children}
     </OrderContext.Provider>
   );

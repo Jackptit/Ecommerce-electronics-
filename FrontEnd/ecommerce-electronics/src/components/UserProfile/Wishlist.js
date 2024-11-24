@@ -1,89 +1,109 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { getAccessToken } from "../../utils/commonFunction";
+import { useUserContext } from "../../contexts/UserContext";
+import { toast } from "react-toastify";
 
 const Wishlist = () => {
-  const products = [
-    {
-      id: 1,
-      name: "Sản phẩm 1",
-      description: "Mô tả sản phẩm 1",
-      price: "500,000 VND",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/42/314210/oppo-reno-11-pro-trang-thumb-600x600.jpg",
-    },
-    {
-      id: 2,
-      name: "Sản phẩm 2",
-      description: "Mô tả sản phẩm 2",
-      price: "1,200,000 VND",
-      image:
-        "https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/44/329858/asus-x1504za-i5-nj1608w-thumb-638621785794788808-600x600.jpg",
-    },
-    {
-      id: 3,
-      name: "Sản phẩm 3",
-      description: "Mô tả sản phẩm 3",
-      price: "750,000 VND",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/522/326643/lenovo-tab-m11-grey-thumb-600x600.jpg",
-    },
-    {
-      id: 4,
-      name: "Sản phẩm 4",
-      description: "Mô tả sản phẩm 4",
-      price: "950,000 VND",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/7264/279658/mvw-ml068-01-nam-thumb-fix-600x600.jpg",
-    },
-    {
-      id: 4,
-      name: "Sản phẩm 4",
-      description: "Mô tả sản phẩm 4",
-      price: "950,000 VND",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/44/308697/msi-gaming-gf63-thin-12ve-i5-460vn-thumb-600x600.png",
-    },
-    {
-      id: 4,
-      name: "Sản phẩm 4",
-      description: "Mô tả sản phẩm 4",
-      price: "950,000 VND",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/42/314210/oppo-reno-11-pro-trang-thumb-600x600.jpg",
-    },
-    {
-      id: 4,
-      name: "Sản phẩm 4",
-      description: "Mô tả sản phẩm 4",
-      price: "950,000 VND",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/42/314210/oppo-reno-11-pro-trang-thumb-600x600.jpg",
-    },
-    {
-      id: 4,
-      name: "Sản phẩm 4",
-      description: "Mô tả sản phẩm 4",
-      price: "950,000 VND",
-      image:
-        "https://cdn.tgdd.vn/Products/Images/42/314210/oppo-reno-11-pro-trang-thumb-600x600.jpg",
-    },
-  ];
+  const token = getAccessToken();
+  const { userState, dispatch, updateUser } = useUserContext();
+  const [userData, setUserData] = useState(userState?.user);
+  const [favouriteProducts, setFavouriteProduct] = useState([]);
+
+  useEffect(() => {
+    // Update userData if state.user changes
+    if (userState.user) {
+      setUserData(userState.user);
+    }
+  }, [userState.user]);
+
+  useEffect(() => {
+    if (userState.user) {
+      setUserData(userState.user);
+    }
+    const getAllFavouriteProduct = async () => {
+      const favouriteProductIDs = userData?.favourite
+        .toString()
+        .split(",")
+        .map(Number);
+      const products = await axios.get("http://localhost:8080/api/product");
+      console.log(products);
+      const favouriteProducts = products.data.filter((product) =>
+        favouriteProductIDs?.includes(product.id)
+      );
+      setFavouriteProduct(favouriteProducts);
+    };
+    getAllFavouriteProduct();
+  }, [userState.user]);
+
+  // if (userState.loading) {
+  //   return <p>Loading user data...</p>;
+  // }
+
+  // if (userState.error) {
+  //   return <p>Error: {userState.error}</p>;
+  // }
+
+  // if (!userState.user) {
+  //   return <p>No user data found.</p>;
+  // }
+
+  const handleRemove = async (favouriteProductID) => {
+    try {
+      const newFavouriteIds = userState?.user.favourite
+        .split(",")
+        .filter((item) => Number(item) !== favouriteProductID)
+        .join(",");
+
+      const response = await updateUser({favourite: newFavouriteIds});
+     
+      if(response.status === 200){
+        dispatch({ type: "UPDATE_USER_INFO", payload: response.data });
+        setUserData(response.data);
+        toast.success('Xóa sản phẩm yêu thích thành công !');
+      }
+      //
+    } catch (error) {
+      console.log(error);
+      toast.error('Có lỗi xảy ra vui long thử lại sau !')
+    }
+  };
 
   return (
     <div className="container wishlist">
       <h2 className="my-4">Sản phẩm yêu thích</h2>
       <div className="row">
-        {products.map((product) => (
+        {favouriteProducts.map((product) => (
           <div key={product.id} className="col-md-3 mb-4">
-            <div className="card">
+            <div className="card position-relative">
+              {/* Nút Remove */}
+              <button
+                className="btn btn-sm btn-danger position-absolute top-0 end-0"
+                onClick={() => handleRemove(product.id)}
+              >
+                ✕
+              </button>
               <img
-                src={product.image}
+                src={product.image.split(",")[1]}
                 alt={product.name}
                 className="card-img-top"
               />
               <div className="card-body">
-                <h5 className="card-title">{product.name}</h5>
-                <p className="card-text">{product.description}</p>
-                <p className="card-text text-success">{product.price}</p>
+                <h5
+                  className="card-title"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 4,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {product.name}
+                </h5>
+                <p className="card-text text-success">
+                  {product.price.toLocaleString("vi-VN")} ₫
+                </p>
                 <button className="btn btn-primary">Thêm vào giỏ</button>
               </div>
             </div>

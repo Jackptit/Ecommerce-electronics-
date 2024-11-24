@@ -54,6 +54,7 @@ export const UserProvider = ({ children }) => {
       });
 
       dispatch({ type: "SET_USER", payload: response.data });
+      return response.data
     } catch (error) {
       console.error("Error fetching user:", error);
       dispatch({ type: "ERROR", payload: error.message });

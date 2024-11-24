@@ -49,7 +49,6 @@ const AuthForm = () => {
 
         if (response.accessToken !== undefined) {
           handleGetUserData(response.accessToken);
-          navigate('/')
         }
         else if (response.status === 401) {
           setServerError("Thông tin đăng nhập không chính xác.");
@@ -64,8 +63,15 @@ const AuthForm = () => {
   }
 
   const handleGetUserData = async(accessToken ) =>{
-    await fetchUser(accessToken);
+    const user = await fetchUser(accessToken);
+    console.log('user',user)
     await fetchAddress(accessToken);
+    if(user.idRole === 1){
+      navigate('/admin');
+    }
+    else{
+      navigate('/');
+    }
   }
   return (
 

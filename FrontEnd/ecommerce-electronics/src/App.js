@@ -61,7 +61,6 @@ function MainApp() {
   const isExcluded = excludedRoutes.some((route) =>
     location.pathname.includes(route)
   );
-  const isAdmin = userData?.idRole == 1 ? true : false;
   return (
     <>
       {!isExcluded && (
@@ -81,14 +80,9 @@ function MainApp() {
         <Route path="/user-profile/*" element={<UserProfile />} />
         <Route path="/payment" element={<PaymentPage />} />
 
-        {/* Admin routes */}
-        {/* <Route
-        path="/admin/*"
-        element={isAdmin ? <AdminPage /> : <Navigate to="/login" />}
-      /> */}
         <Route
           path="/admin/*"
-          element={userData?.idRole == 2 ? <AdminPage /> : <Navigate to="/login" />}
+          element={<AdminPage />}
         />
       </Routes>
       {!isExcluded && (
