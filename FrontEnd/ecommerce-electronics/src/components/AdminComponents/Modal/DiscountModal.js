@@ -6,19 +6,17 @@ const DiscountModal = ({ showModal, currentCoupon, handleInputChange, handleSave
 
   useEffect(() => {
     if (!currentCoupon.id) {
-      setCoupon({ name: '', code: '', discount: '', startDate: '', endDate: '' }); // Reset the form for a new coupon
-      setErrors({}); // Clear errors when opening the modal for a new coupon
+      setCoupon({ name: '', code: '', discountPercent: '', startDate: '', endDate: '', quantity: '' }); // Thêm quantity
+      setErrors({});
     } else {
       setCoupon(currentCoupon);
     }
   }, [currentCoupon]);
 
-  // Handle input change for fields
   const handleFieldChange = (e) => {
     handleInputChange(e, setCoupon);
   };
 
-  // Validate the form fields
   const validateForm = () => {
     const errors = {};
     if (!coupon.name) {
@@ -38,19 +36,21 @@ const DiscountModal = ({ showModal, currentCoupon, handleInputChange, handleSave
     } else if (new Date(coupon.endDate) < new Date(coupon.startDate)) {
       errors.endDate = 'Ngày kết thúc phải sau ngày bắt đầu';
     }
+    if (!coupon.quantity || coupon.quantity <= 0) {
+      errors.quantity = 'Số lượng phải lớn hơn 0';
+    }
     setErrors(errors);
-    return Object.keys(errors).length === 0; // If no errors, return true
+    return Object.keys(errors).length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = () => {
     if (validateForm()) {
-      handleSave(coupon); // Only save if validation passes
+      handleSave(coupon);
     }
   };
 
   const handleModalClose = () => {
-    handleClose(); // Close the modal
+    handleClose();
   };
 
   if (!showModal) return null;
@@ -79,7 +79,7 @@ const DiscountModal = ({ showModal, currentCoupon, handleInputChange, handleSave
               </div>
 
               <div className="mb-2">
-                <label className="form-label">Mã:</label>
+                <label className="form-label">Mã Code:</label>
                 <input
                   type="text"
                   className={`form-control form-control-sm ${errors.code ? 'is-invalid' : ''}`}
@@ -92,12 +92,12 @@ const DiscountModal = ({ showModal, currentCoupon, handleInputChange, handleSave
               </div>
 
               <div className="mb-2">
-                <label className="form-label">Giảm giá:</label>
+                <label className="form-label">Giảm giá (%):</label>
                 <input
                   type="number"
                   className={`form-control form-control-sm ${errors.discount ? 'is-invalid' : ''}`}
                   name="discount"
-                  value={coupon.discount}
+                  value={coupon.discountPercent}
                   onChange={handleFieldChange}
                   required
                 />
@@ -129,12 +129,23 @@ const DiscountModal = ({ showModal, currentCoupon, handleInputChange, handleSave
                 />
                 {errors.endDate && <div className="invalid-feedback">{errors.endDate}</div>}
               </div>
+
+              <div className="mb-2">
+                <label className="form-label">Số lượng mã giảm giá:</label>
+                <input
+                  type="number"
+                  className={`form-control form-control-sm ${errors.quantity ? 'is-invalid' : ''}`}
+                  name="quantity"
+                  value={coupon.quantity}
+                  min="1"
+                  onChange={handleFieldChange}
+                  required
+                />
+                {errors.quantity && <div className="invalid-feedback">{errors.quantity}</div>}
+              </div>
             </form>
           </div>
           <div className="modal-footer">
-            <button className="btn btn-secondary btn-sm" onClick={handleModalClose}>
-              Hủy
-            </button>
             <button
               className="btn btn-primary btn-sm"
               onClick={handleSubmit}

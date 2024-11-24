@@ -49,8 +49,8 @@ export const AddressProvider = ({ children }) => {
         },
       });
 
-      console.log("response: ", response);
-      dispatch({ type: "SET_ADDRESS", payload: response.data });
+      if(response.ok)
+        dispatch({ type: "SET_ADDRESS", payload: response.data });
     } catch (error) {
       console.error("Error fetching address:", error);
       dispatch({ type: "ERROR", payload: error.message });

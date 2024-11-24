@@ -1,39 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button, Modal, Form } from "react-bootstrap";
-
-const mockReviews = [
-  {
-    id: 1,
-    product: "Laptop Dell XPS 13",
-    user: "Nguyen Van A",
-    content: "Sản phẩm rất tốt, chạy mượt mà.",
-    rating: 5,
-    isRepply: true,
-    response: "Cảm ơn bạn đã đánh giá sản phẩm của chúng tôi!",
-  },
-  {
-    id: 2,
-    product: "Tai nghe Bluetooth Sony WH-1000XM4",
-    user: "Tran Thi B",
-    content: "Âm thanh hay nhưng kết nối đôi khi bị ngắt.",
-    rating: 4,
-    isRepply: false,
-    response: "",
-  },
-  {
-    id: 3,
-    product: "Điện thoại iPhone 14",
-    user: "Le Van C",
-    content: "Giá cao nhưng hiệu năng tốt.",
-    rating: 4,
-    isRepply: true,
-    response: "",
-  },
-];
+import {  useNavigate } from "react-router-dom";
+import { useOrdersContext } from "../../../contexts/UserContext"; // Import context
+import { toast } from "react-toastify"; // Import toast
+import { getAccessToken } from "../../../utils/commonFunction";
+import axios from "axios";
 
 const AdminReviewPage = () => {
-  
-  const [reviews, setReviews] = useState(mockReviews);
+  const navigate = useNavigate();
+  const token = getAccessToken();
+  const [reviews, setReviews] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
   const [response, setResponse] = useState("");
@@ -41,6 +17,33 @@ const AdminReviewPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [ratingFilter, setRatingFilter] = useState(""); // Filter by rating
   const [statusFilter, setStatusFilter] = useState(""); // Filter by response status
+
+  useEffect(() => {
+    fetchAllFeedback();
+  }, []);
+
+  const fetchAllFeedback = async () => {
+    try {
+      if (!token) {
+        //dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
+        return;
+      }
+
+      const feedbacks = await axios.get("http://localhost:8080/api/feedback", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      setReviews(feedbacks.data);
+    } catch (error) {
+      console.log("Error fetching feedbacks:", error);
+      if(error.status === 401){
+        navigate('/login');
+      }
+    }
+  };
 
   const handleModalOpen = (review) => {
     setSelectedReview(review);
@@ -54,19 +57,52 @@ const AdminReviewPage = () => {
     setShowModal(false);
   };
 
-  const handleSubmitResponse = () => {
-    if (!response.trim()) {
+  const handleSubmitResponse = async () => {
+    if (!response?.trim()) {
       setError("Vui lòng nhập phản hồi!");
       return;
     }
 
-    const updatedReviews = reviews.map((review) =>
-      review.id === selectedReview.id
-        ? { ...review, response, isRepply: true }
-        : review
-    );
-    setReviews(updatedReviews);
-    handleModalClose();
+    try {
+      if (!token) {
+        //dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
+        return;
+      }
+
+      const dataUpdate = {
+        id: selectedReview.id,
+        reply: response?.trim(),
+      };
+
+      // admin reply
+      const feedbackReply = await axios.put(
+        "http://localhost:8080/api/feedback",
+        dataUpdate,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      //update state
+      const updatedReviews = reviews.map((review) =>
+        review.id === dataUpdate.id
+          ? { ...review, reply: feedbackReply.data.reply }
+          : review
+      ); 
+
+      setReviews(updatedReviews);
+      handleModalClose();
+      toast.success('Đã gửi phản hồi đánh giá thành công !');
+    } catch (error) {
+      console.log("Error fetching feedbacks:", error);
+      toast.error('Đã có lỗi xảy ra vui lòng thử lại sau !');
+      if(error.status === 401){
+        navigate('/login');
+      }
+    }
   };
 
   // Hàm tìm kiếm
@@ -75,15 +111,19 @@ const AdminReviewPage = () => {
   };
 
   // Lọc danh sách đánh giá theo từ khóa tìm kiếm, số sao, và trạng thái phản hồi
-  const filteredFeedbacks = reviews.filter((review) => {
-    const matchesSearchTerm = review.product
-      .toLowerCase()
+  const filteredFeedbacks = reviews?.filter((review) => {
+    const matchesSearchTerm = review.product.name
+      ?.toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesRating =
-      ratingFilter === "" || review.rating === parseInt(ratingFilter);
+      ratingFilter === "" ||
+      (Number.isInteger(parseInt(ratingFilter)) &&
+        review.star === parseInt(ratingFilter));
     const matchesStatus =
       statusFilter === "" ||
-      (statusFilter === "responded" ? review.isRepply : !review.isRepply);
+      (statusFilter === "responded"
+        ? review.reply && review.reply?.trim() !== ""
+        : !review.reply || review.reply?.trim() === "");
 
     return matchesSearchTerm && matchesRating && matchesStatus;
   });
@@ -154,12 +194,22 @@ const AdminReviewPage = () => {
             filteredFeedbacks.map((review, index) => (
               <tr key={review.id}>
                 <td>{index + 1}</td>
-                <td>{review.product}</td>
-                <td>{review.user}</td>
-                <td>{review.content}</td>
-                <td>{review.rating} ⭐</td>
+                <td
+                  style={{
+                    maxWidth: "450px",
+                    wordWrap: "break-word",
+                    whiteSpace: "normal",
+                  }}
+                >
+                  {review.product.name}
+                </td>
+
+                <td>{review.user.username}</td>
+                <td>{review.description}</td>
+                <td>{review.star} ⭐</td>
                 <td>
-                  {!review.isRepply ? (
+                  {review.reply?.trim() === "" ||
+                  !review.reply ? (
                     <Button size="sm" onClick={() => handleModalOpen(review)}>
                       Phản hồi
                     </Button>
@@ -172,7 +222,7 @@ const AdminReviewPage = () => {
           ) : (
             <tr>
               <td colSpan="6" style={{ textAlign: "center" }}>
-                Không có kết quả phù hợp
+                Không có dữ liệu
               </td>
             </tr>
           )}
