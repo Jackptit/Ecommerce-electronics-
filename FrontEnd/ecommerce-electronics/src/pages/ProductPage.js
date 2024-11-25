@@ -4,6 +4,7 @@ import ProductImage from "../components/ProductImage";
 import UserComment from "../components/UserComment";
 import { Container, Button } from "react-bootstrap";
 import ModalComment from "../components/ModalComment";
+import { useLocation, useParams } from 'react-router-dom';
 const ProductPage = () => {
   const product = {
     name: "Màn hình LCD Xiaomi G27i EU ELA5375EU 27 inch (1920x1080/ IPS/ 165Hz/ 1ms)",
@@ -31,6 +32,11 @@ const ProductPage = () => {
   const [showModal, setShowModal] = React.useState(false);
   const handleShowModal = () => { setShowModal(true) };
   const handleCloseModal = () => { setShowModal(false) };
+  const location = useLocation();
+  const productNavigate=location.state?.productData;
+  const {id} = useParams();
+  console.log("đây là id " , id);
+  console.log(productNavigate);
   return (
     <Wrapper>
       <div className="product-center">

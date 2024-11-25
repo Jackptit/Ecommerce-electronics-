@@ -26,7 +26,7 @@ const Wishlist = () => {
         .toString()
         .split(",")
         .map(Number);
-      const products = await axios.get("http://localhost:8080/api/product");
+      const products = await axios.get("http://192.168.33.9:8080/api/product");
       console.log(products);
       const favouriteProducts = products.data.filter((product) =>
         favouriteProductIDs?.includes(product.id)

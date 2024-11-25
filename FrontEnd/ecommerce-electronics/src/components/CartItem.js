@@ -46,7 +46,7 @@ const CartItem = ({ item }) => {
         </Col>
         <Col xs={3}>
           <div>
-            <h5>{name}</h5>
+            <h6>{name}</h6>
             <p className="text-muted">SKU: {id}</p>
           </div>
         </Col>

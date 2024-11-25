@@ -26,4 +26,20 @@ export const saveAccessToken = (token) => {
       return false;
     }
   };
+  export const saveCategories = (categories) => {
+    if (categories) {
+      localStorage.setItem('categories', categories);
+    }
+  }
+  export const getCategories = () => {
+    return localStorage.getItem('categories');
+  }
+  export const saveProducts = (products) => {
+    
+      localStorage.setItem('products', products);
+    
+  }
+  export const getProducts = () => {
+    return localStorage.getItem('products');
+  }
   

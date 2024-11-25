@@ -42,7 +42,7 @@ export const AddressProvider = ({ children }) => {
         return;
       }
 
-      const response = await axios.get("http://localhost:8080/api/address", {
+      const response = await axios.get("http://192.168.33.9:8080/api/address", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export const AddressProvider = ({ children }) => {
       dispatch({ type: "LOADING" });
 
       const response = await axios.put(
-        "http://localhost:8080/api/address",
+        "http://192.168.33.9:8080/api/address",
         address, 
         {
           headers: {
@@ -99,7 +99,7 @@ export const AddressProvider = ({ children }) => {
       dispatch({ type: "LOADING" });
   
       const response = await axios.post(
-        "http://localhost:8080/api/address", 
+        "http://192.168.33.9:8080/api/address", 
         address,
         {
           headers: {
@@ -125,7 +125,7 @@ export const AddressProvider = ({ children }) => {
         return;
       }
   
-      const response = await axios.delete(`http://localhost:8080/api/address/${id}`, {
+      const response = await axios.delete(`http://192.168.33.9:8080/api/address/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

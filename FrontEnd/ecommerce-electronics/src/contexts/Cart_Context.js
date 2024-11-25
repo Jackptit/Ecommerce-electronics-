@@ -6,7 +6,8 @@ import 'react-toastify/dist/ReactToastify.css';
 const init = {
     cart: [],
     total: 0,
-    amount: 0
+    amount: 0,
+
 }
 const Cart_Context = React.createContext();
 export const CartProvider = ({ children }) => {
@@ -26,6 +27,21 @@ export const CartProvider = ({ children }) => {
     };
     const countCartTotals = () => {
         dispatch({ type: 'COUNT_CART_TOTALS' });
+    }
+    useEffect(() => {
+       
+    }, [state]);
+    const fetchCart= async (accessToken)=>{
+        try {
+            if (!accessToken) {
+              dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
+              return;
+            }
+        }
+        catch (error) {
+            console.error("Error fetching cart:", error);
+            
+        }
     }
     return (
         <Cart_Context.Provider value={{ ...state, cartBuy, setCartBuy, addToCart, increaseQuantity, decreaseQuantity, removeItem, countCartTotals }}>

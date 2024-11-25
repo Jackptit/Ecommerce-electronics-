@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import axios from "axios";
 import { getAccessToken } from "../utils/commonFunction";
-import userReducer from "../reducers/UserReducer";
+import userReducer from "../reducers/userReducer";
 import { useAuthContext } from "./Auth_Context";
 import { useAddressContext } from "./AddressContext";
 
@@ -46,7 +46,7 @@ export const UserProvider = ({ children }) => {
         return;
       }
 
-      const response = await axios.get("http://localhost:8080/api/user", {
+      const response = await axios.get("http://192.168.33.9:8080/api/user", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -73,7 +73,7 @@ export const UserProvider = ({ children }) => {
 
       // Gửi dữ liệu cập nhật người dùng qua API
       const response = await axios.put(
-        "http://localhost:8080/api/user",
+        "http://192.168.33.9:8080/api/user",
         userData, // Dữ liệu người dùng cần cập nhật
         {
           headers: {

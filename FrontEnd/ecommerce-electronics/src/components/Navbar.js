@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Offcanvas from 'react-bootstrap/Offcanvas';
+import axios from "axios";
+import { ListGroup } from "react-bootstrap";
+import { saveCategories,getProducts } from "../utils/commonFunction";
 import {
   faUser,
   faShoppingCart,
@@ -13,6 +17,7 @@ import {
   faDesktop,
   faClock,
   faRecycle,
+  faBars,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import {
@@ -28,16 +33,57 @@ import {
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useUserContext } from "../contexts/UserContext";
-
 const NavbarComponent = () => {
   const { userState, dispatch, fetchUser } = useUserContext();
   const [userData, setUserData] = useState(userState?.user);
-  
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  const [searchQuery, setSearchQuery] = useState(""); // State để lưu giá trị tìm kiếm
+  const [suggestions, setSuggestions] = useState([]); // State để lưu danh sách gợi ý
   useEffect(() => {
     if (userState.user) {
       setUserData(userState.user);
     }
   }, [userState.user]);
+  const [categories, setCategories] = useState([]);
+  useEffect( () => {
+    const fetchData = async () => {
+    try {
+      const response = await axios.get("http://192.168.33.9:8080/api/category",{headers:{"Content-Type":"application/json"}});
+      console.log(response.data);
+      saveCategories(response.data);
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+    
+  }
+  fetchData();
+  },[])
+ const products =  JSON.parse(getProducts());
+ const listnameProduct=[]; 
+ {
+   products.map((product) => {
+     listnameProduct.push(product.name);
+   })
+ }
+  // Hàm xử lý sự kiện khi người dùng nhập liệu vào ô tìm kiếm
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    // Lọc danh sách sản phẩm dựa trên input của người dùng
+    if (query) {
+      const filteredSuggestions = listnameProduct.filter((product) =>
+        product.toLowerCase().includes(query.toLowerCase()) // Lọc các sản phẩm có chứa từ khóa tìm kiếm
+      );
+      setSuggestions(filteredSuggestions);
+    } else {
+      setSuggestions([]); // Nếu không có từ khóa tìm kiếm, không hiển thị gợi ý
+    }
+  };
   return (
     <>
       <Navbar bg="warning" expand="lg" variant="light" sticky="top">
@@ -82,6 +128,8 @@ const NavbarComponent = () => {
                     aria-label="Search"
                     className="me-2"
                     style={{ borderRadius: "20px", paddingRight: "20px" }} // Padding để chừa chỗ cho biểu tượng
+                    value={searchQuery}
+                    onChange={handleSearch}
                   />
                   <FontAwesomeIcon
                     icon={faSearch}
@@ -95,6 +143,29 @@ const NavbarComponent = () => {
                     }}
                   />
                 </InputGroup>
+                {suggestions.length > 0 && (
+          <ListGroup
+            style={{
+              position: "absolute",
+              top: "100%",
+              left: "0",
+              right: "0",
+              zIndex: 10,
+              maxHeight: "200px",
+              overflowY: "auto",
+              backgroundColor: "#fff",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+              boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            {suggestions.map((suggestion, index) => (
+              <ListGroup.Item key={index} style={{ cursor: "pointer" }}>
+                {suggestion} {/* Tùy chỉnh cách hiển thị gợi ý */}
+              </ListGroup.Item>
+            ))}
+          </ListGroup>
+        )}
               </Form>
               {/* Login, Cart, Location */}
               <div className="d-flex align-items-center">
@@ -140,7 +211,31 @@ const NavbarComponent = () => {
 
             {/* Product Categories */}
             <Col xs={12} className="mt-2">
+            
               <Nav className="justify-content-between">
+              <>
+              <Button 
+                variant="warning" 
+                onClick={handleShow}>
+                <FontAwesomeIcon icon={faBars} />
+                Danh mục sản phẩm
+              </Button>
+              <Offcanvas show={show} onHide={handleClose}>
+                <Offcanvas.Header closeButton>
+                  <Offcanvas.Title>Danh mục sản phẩm</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body>
+                  <ListGroup>
+                    {categories.map((category, index) => (
+                      <ListGroup.Item key={index} action className="d-flex align-items-center">
+                        <span className="">{category.icon}</span>
+                        {category.name}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </Offcanvas.Body>
+              </Offcanvas>
+              </>
                 <Nav.Link href="#phones" className="text-dark">
                   <FontAwesomeIcon icon={faMobileAlt} /> Điện thoại
                 </Nav.Link>
@@ -155,9 +250,6 @@ const NavbarComponent = () => {
                 </Nav.Link>
                 <Nav.Link href="#tablets" className="text-dark">
                   <FontAwesomeIcon icon={faTabletAlt} /> Tablet
-                </Nav.Link>
-                <Nav.Link href="#old-new" className="text-dark">
-                  <FontAwesomeIcon icon={faRecycle} /> Máy cũ
                 </Nav.Link>
               </Nav>
             </Col>

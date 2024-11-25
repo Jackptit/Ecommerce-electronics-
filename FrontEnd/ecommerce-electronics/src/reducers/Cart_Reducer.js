@@ -60,6 +60,11 @@ const Cart_Reducer = (state, action) => {
                 total: totalAmount,
                 amount: totalItem
             }
+        case "ERROR":
+            return {
+                ...state,
+                error: action.payload,
+            };
         default:
             return state;
     }
