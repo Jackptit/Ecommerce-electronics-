@@ -49,7 +49,7 @@ export const AddressProvider = ({ children }) => {
         },
       });
 
-      if(response.ok)
+      //if(response.ok)
         dispatch({ type: "SET_ADDRESS", payload: response.data });
     } catch (error) {
       console.error("Error fetching address:", error);
