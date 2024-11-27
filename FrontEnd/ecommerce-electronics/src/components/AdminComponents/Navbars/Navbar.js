@@ -16,6 +16,8 @@ const Header = () => {
   useEffect(() => {
     // Update userData if state.user changes
     if (userState.user) {
+      if(userState?.user?.idRole !== 1)
+        navigate("/login", { replace: true });
       setUserData(userState.user);
     }
   }, [userState.user]);

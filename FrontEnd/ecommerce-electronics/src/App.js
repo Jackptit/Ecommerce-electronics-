@@ -33,23 +33,23 @@ function MainApp() {
   const { userState, dispatch, fetchUser } = useUserContext();
   const [userData, setUserData] = useState(userState?.user);
 
-  useEffect(() => {
-    const token = getAccessToken();
-    const fetchUserData = async () => {
-      if (token && !userState.user && !userState.loading) {
-        console.log("Fetching user...");
-        await fetchUser(token);
-      }
-    };
+  // useEffect(() => {
+  //   const token = getAccessToken();
+  //   const fetchUserData = async () => {
+  //     if (token && !userState.user && !userState.loading) {
+  //       console.log("Fetching user...");
+  //       await fetchUser(token);
+  //     }
+  //   };
     
-    fetchUserData(); // Gọi hàm async
-  }, [userState.user, userState.loading]);
+  //   fetchUserData(); // Gọi hàm async
+  // }, [userState.user, userState.loading]);
 
-  useEffect(() => {
-    if (userState.user) {
-      setUserData(userState.user);
-    }
-  }, [userState.user]);
+  // useEffect(() => {
+  //   if (userState.user) {
+  //     setUserData(userState.user);
+  //   }
+  // }, [userState.user]);
 
   const settings = {
     avatar:

@@ -13,7 +13,7 @@ function ConfirmModal({ show, onClose, onConfirm, title, bodyText }) {
           Hủy
         </Button>
         <Button variant="danger" onClick={onConfirm}>
-          Xóa
+          Xác nhận
         </Button>
       </Modal.Footer>
     </Modal>
