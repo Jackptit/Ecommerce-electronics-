@@ -1,23 +1,34 @@
 // src/components/Register.js
-import React from 'react';
-import { useState } from 'react';
+import React from "react";
+import { useState } from "react";
 import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import ImageBackground from '../assets/electronic.png'; // Import hình ảnh từ assets
+import ImageBackground from "../assets/electronic.png"; // Import hình ảnh từ assets
 import "./css/Register.css"; // Import CSS từ file Register.css
-const Register = () => {
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { saveAccessToken } from "../utils/commonFunction";
+import { useUserContext } from "../contexts/UserContext";
+import { useAddressContext } from "../contexts/AddressContext";
+import RegisterSuccessModal from "./UserProfile/Model/RegisterSuccessModal";
+import { getAccessToken } from "../utils/commonFunction";
 
+const Register = () => {
+  const navigate = useNavigate();
+  const { userState, fetchUser } = useUserContext();
+  const { addressState, fetchAddress, addAddress } = useAddressContext();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
-    fullName: "",
     address: "",
     email: "",
-    birthDate: "",
-    phoneNumber: ""
+    birthday: "",
+    phone: "",
   });
   const [errors, setErrors] = useState({});
   const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [isRegisterSuccess, setIsRegisterSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,10 +54,6 @@ const Register = () => {
       validationErrors.password = "Password is required";
     }
 
-    if (!formData.fullName) {
-      validationErrors.fullName = "Full Name is required";
-    }
-
     if (!formData.address) {
       validationErrors.address = "Address is required";
     }
@@ -57,32 +64,113 @@ const Register = () => {
       validationErrors.email = "Email is invalid";
     }
 
-    if (!formData.birthDate) {
-      validationErrors.birthDate = "Birth Date is required";
+    if (!formData.birthday) {
+      validationErrors.birthday = "Birth Date is required";
     }
 
-    if (!formData.phoneNumber) {
-      validationErrors.phoneNumber = "Phone Number is required";
-    } else if (!/^[0-9]{10}$/.test(formData.phoneNumber)) {
-      validationErrors.phoneNumber = "Phone Number must be 10 digits";
+    if (!formData.phone) {
+      validationErrors.phone = "Phone Number is required";
+    } else if (!/^[0-9]{10}$/.test(formData.phone)) {
+      validationErrors.phone = "Phone Number must be 10 digits";
     }
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       setShowErrorAlert(true);
     } else {
+      handleRegister(formData);
       console.log("Form submitted successfully", formData);
       setShowErrorAlert(false);
       setErrors({});
     }
   };
 
+  const handleRegister = async (newUser) => {
+    try {
+      const user = await axios.post(
+        "http://localhost:8080/api/auth/register",
+        newUser
+      );
+
+      console.log(user);
+      if (!user) {
+        console.log(user);
+        toast.error(user.data.message);
+        return;
+      }
+
+      const response = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phone: user.data.phone,
+          password: user.data.password,
+        }),
+      }).then((response) => response.json());
+
+      saveAccessToken(response.accessToken); //save token to localstored
+
+      await addAddress(parseAddress(newUser.address));
+
+      if (response.accessToken !== undefined) {
+        setIsRegisterSuccess(true);
+      }
+    } catch (error) {
+      console.log("Error register:", error.response.data.message);
+      if (error.status === 400) {
+        toast.error(error.response.data.message);
+      }
+    }
+  };
+
+  const handleGetUserData = async (accessToken) => {
+    const user = await fetchUser(accessToken);
+    await fetchAddress(accessToken);
+    if (user.idRole === 1) {
+      navigate("/admin");
+    } else {
+      navigate("/");
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsRegisterSuccess(false);
+    const token = getAccessToken();
+    handleGetUserData(token);
+  }
+
+  const parseAddress = (stringAddress) => {
+    try {
+      const parts = stringAddress.split(",").map((part) => part.trim());
+      const province = parts.pop().trim();
+      const district = parts.pop().trim();
+      const ward = parts.pop().trim();
+
+      const specificAddress = parts.join(", ");
+
+      return {
+        province: province,
+        district: district,
+        ward: ward,
+        specificAddress: specificAddress,
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <Container fluid className="d-flex align-items-center justify-content-center min-vh-100 ">
+    <Container
+      fluid
+      className="d-flex align-items-center justify-content-center min-vh-100 "
+    >
       <Row className="w-100" style={{ maxWidth: "900px" }}>
-
-        <Col md={6} className="d-flex align-items-center justify-content-center">
-
+        <Col
+          md={6}
+          className="d-flex align-items-center justify-content-center"
+        >
           <img
             src={ImageBackground}
             alt="Register Illustration"
@@ -93,7 +181,11 @@ const Register = () => {
         <Col md={6} className="d-flex flex-column justify-content-center">
           <h3 className="text-center mb-4">Register</h3>
           {showErrorAlert && (
-            <Alert variant="danger" onClose={() => setShowErrorAlert(false)} dismissible>
+            <Alert
+              variant="danger"
+              onClose={() => setShowErrorAlert(false)}
+              dismissible
+            >
               Please correct the errors below before submitting.
             </Alert>
           )}
@@ -101,7 +193,7 @@ const Register = () => {
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3" controlId="formBasicUsername">
-                  <Form.Label>Username</Form.Label>
+                  <Form.Label>Full name</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Enter username"
@@ -134,18 +226,18 @@ const Register = () => {
             </Row>
             <Row>
               <Col md={6}>
-                <Form.Group className="mb-3" controlId="formBasicFullName">
-                  <Form.Label>Full Name</Form.Label>
+                <Form.Group className="mb-3" controlId="formBasicPhoneNumber">
+                  <Form.Label>Phone Number</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="Enter full name"
-                    name="fullName"
-                    value={formData.fullName}
+                    placeholder="Enter phone number"
+                    name="phone"
+                    value={formData.phone}
                     onChange={handleChange}
-                    isInvalid={!!errors.fullName}
+                    isInvalid={!!errors.phone}
                   />
                   <Form.Control.Feedback type="invalid">
-                    {errors.fullName}
+                    {errors.phone}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Col>
@@ -181,36 +273,19 @@ const Register = () => {
               </Form.Control.Feedback>
             </Form.Group>
 
-
             <Row>
-              <Col md={6}>
+              <Col md={12}>
                 <Form.Group className="mb-3" controlId="formBasicBirthDate">
                   <Form.Label>Birth Date</Form.Label>
                   <Form.Control
                     type="date"
-                    name="birthDate"
-                    value={formData.birthDate}
+                    name="birthday"
+                    value={formData.birthday}
                     onChange={handleChange}
-                    isInvalid={!!errors.birthDate}
+                    isInvalid={!!errors.birthday}
                   />
                   <Form.Control.Feedback type="invalid">
-                    {errors.birthDate}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group className="mb-3" controlId="formBasicPhoneNumber">
-                  <Form.Label>Phone Number</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter phone number"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                    isInvalid={!!errors.phoneNumber}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.phoneNumber}
+                    {errors.birthday}
                   </Form.Control.Feedback>
                 </Form.Group>
               </Col>
@@ -221,6 +296,7 @@ const Register = () => {
           </Form>
         </Col>
       </Row>
+      <RegisterSuccessModal open={isRegisterSuccess} onClose={handleCloseModal} />
     </Container>
   );
 };

@@ -8,6 +8,7 @@ import Headphone from "../assets/tai-nghe-sony-wf-c510-home.webp";
 import Phone from "../assets/tecno-spark-go-1-home.webp";
 import FeaturedProducts from "../components/FeaturedProducts";
 import { useReducer, useState } from "react";
+import Livechat from "../components/Livechat";
 
 
 const Home = () => {
@@ -24,6 +25,7 @@ const Home = () => {
   return (
     <>
       <Wrapper>
+      <Livechat/>
         <SliderWrapper>
           <Slider {...settings}>
             <div className="img-slick">
@@ -39,6 +41,7 @@ const Home = () => {
         </SliderWrapper>
         <FeaturedProducts />
         <FeaturedProducts />
+        
       </Wrapper>
     </>
   );

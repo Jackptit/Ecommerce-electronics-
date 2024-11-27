@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import Sidebar from "../../components/AdminComponents/Sidebar/Sidebar.js";
 import Header from "../../components/AdminComponents/Navbars/Navbar.js";
 import AdminFeedback from "./view/AdminFeedback.js";
 import Coupon from "./view/Coupon.js";
+import OrderManagement from "./view/Order.js";
 
 import "./AdminPage.css";
 
@@ -19,6 +21,7 @@ const AdminPage = () => {
             <Route index element={<Navigate to="discount" replace />} />
             <Route path="discount" element={<Coupon />} />
             <Route path="feedback" element={<AdminFeedback />} />
+            <Route path="order" element={<OrderManagement />} />
           </Routes>
         </div>
       </div>

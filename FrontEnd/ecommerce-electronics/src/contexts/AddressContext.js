@@ -14,7 +14,7 @@ const AddressContext = createContext();
 
 // Initial state
 const initialState = {
-  address: null,
+  address: [],
   loading: false,
   error: null,
 };
@@ -90,8 +90,8 @@ export const AddressProvider = ({ children }) => {
 
   const addAddress = async (address) => {
     try {
-    console.log(token)
-      if (!token) {
+      const token  = getAccessToken();
+      if (!token) {  
         dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
         return;
       }
@@ -108,6 +108,7 @@ export const AddressProvider = ({ children }) => {
           },
         }
       );
+      console.log("adđ", response.data)
   
       dispatch({ type: "ADD_ADDRESS", payload: response.data });
      
