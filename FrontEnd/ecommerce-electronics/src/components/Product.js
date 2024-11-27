@@ -26,7 +26,9 @@ const Product = (product) => {
         <>
             <ProductWrapper>
                 <div className="container">
-                    <Link to={`/product/${product.id}`} className='link'>
+                    <Link to={`/product/${product.id}`} 
+                     state={{ productData: product }}
+                     className='link'>
                     <div className='image-link'>
                         <img src={imageMain} alt={product.name} />
                     </div>
@@ -34,11 +36,9 @@ const Product = (product) => {
                     <span className='w-tag'>Phone</span>
                     <span className='w-tag'>256gb</span>
                     <footer>
-                        <Link to={
-                            {
-                                pathname :`/product/${product.id}`,
-                                state: { productData : product}
-                            }} 
+                        <Link
+                        to={`/product/${product.id}`}
+                        state={{ productData: product }}
                             className='link'>
                             <p className='w-name' style={{
                                 whiteSpace: 'nowrap',
