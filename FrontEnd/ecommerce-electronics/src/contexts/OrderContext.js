@@ -43,7 +43,7 @@ export const OrdersProvider = ({ children }) => {
       }
 
       const ordersResponse = await axios.get(
-        "http://192.168.33.9:8080/api/orders",
+        "http://localhost:8080/api/orders",
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -55,7 +55,7 @@ export const OrdersProvider = ({ children }) => {
       const ordersWithDetails = await Promise.all(
         ordersResponse.data.map(async (order) => {
           const orderDetailsResponse = await axios.get(
-            `http://192.168.33.9:8080/api/order_detail/${order.id}`,
+            `http://localhost:8080/api/order_detail/${order.id}`,
             {
               headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -126,7 +126,7 @@ export const OrdersProvider = ({ children }) => {
         toast.error("Đánh giá sản phẩm thất bại!");
         dispatch({ type: "ERROR", payload: feedbackStatus.message });
       }
-      
+
     } catch (error) {
       console.log("Error feedback orders:", error);
       dispatch({ type: "ERROR", payload: error.message });

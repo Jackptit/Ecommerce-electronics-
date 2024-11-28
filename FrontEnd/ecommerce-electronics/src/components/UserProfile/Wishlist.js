@@ -26,7 +26,7 @@ const Wishlist = () => {
         .toString()
         .split(",")
         .map(Number);
-      const products = await axios.get("http://192.168.33.9:8080/api/product");
+      const products = await axios.get("http://localhost:8080/api/product");
       console.log(products);
       const favouriteProducts = products.data.filter((product) =>
         favouriteProductIDs?.includes(product.id)
@@ -55,9 +55,9 @@ const Wishlist = () => {
         .filter((item) => Number(item) !== favouriteProductID)
         .join(",");
 
-      const response = await updateUser({favourite: newFavouriteIds});
-     
-      if(response.status === 200){
+      const response = await updateUser({ favourite: newFavouriteIds });
+
+      if (response.status === 200) {
         dispatch({ type: "UPDATE_USER_INFO", payload: response.data });
         setUserData(response.data);
         toast.success('Xóa sản phẩm yêu thích thành công !');

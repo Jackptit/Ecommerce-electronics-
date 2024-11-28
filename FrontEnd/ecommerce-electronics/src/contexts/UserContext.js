@@ -23,7 +23,7 @@ const initialState = {
 // Provider component
 export const UserProvider = ({ children }) => {
   const [userState, dispatch] = useReducer(userReducer, initialState);
-  const  token  = getAccessToken();
+  const token = getAccessToken();
   //const { addressState, fetchAddress } = useAddressContext();
 
   if (!token) {
@@ -46,7 +46,7 @@ export const UserProvider = ({ children }) => {
         return;
       }
 
-      const response = await axios.get("http://192.168.33.9:8080/api/user", {
+      const response = await axios.get("http://localhost:8080/api/user", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -73,7 +73,7 @@ export const UserProvider = ({ children }) => {
 
       // Gửi dữ liệu cập nhật người dùng qua API
       const response = await axios.put(
-        "http://192.168.33.9:8080/api/user",
+        "http://localhost:8080/api/user",
         userData, // Dữ liệu người dùng cần cập nhật
         {
           headers: {

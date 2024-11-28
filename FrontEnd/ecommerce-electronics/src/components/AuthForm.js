@@ -37,14 +37,14 @@ const AuthForm = () => {
       setErrors(validationErrors);
     } else {
       try {
-        const response = await fetch('http://192.168.33.9:8080/api/auth/login', {
+        const response = await fetch('http://localhost:8080/api/auth/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({ "phone": username, "password": password }),
         }).then(response => response.json());
-        
+
         saveAccessToken(response.accessToken); //save token to localstored
 
         if (response.accessToken !== undefined) {
@@ -62,14 +62,14 @@ const AuthForm = () => {
     }
   }
 
-  const handleGetUserData = async(accessToken ) =>{
+  const handleGetUserData = async (accessToken) => {
     const user = await fetchUser(accessToken);
-    console.log('user',user)
+    console.log('user', user)
     await fetchAddress(accessToken);
-    if(user.idRole === 1){
+    if (user.idRole === 1) {
       navigate('/admin');
     }
-    else{
+    else {
       navigate('/');
     }
   }
