@@ -34,6 +34,8 @@ import {
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useUserContext } from "../contexts/UserContext";
+import { getAccessToken } from "../utils/commonFunction";
+
 const NavbarComponent = () => {
   const { userState, dispatch, fetchUser } = useUserContext();
   const [userData, setUserData] = useState(userState?.user);
@@ -43,11 +45,12 @@ const NavbarComponent = () => {
   const handleShow = () => setShow(true);
   const [searchQuery, setSearchQuery] = useState(""); // State để lưu giá trị tìm kiếm
   const [suggestions, setSuggestions] = useState([]); // State để lưu danh sách gợi ý
+  const token = getAccessToken();
   useEffect(() => {
     if (userState.user) {
       setUserData(userState.user);
     }
-  }, [userState.user]);
+  }, [userState.user, token]);
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     const fetchData = async () => {

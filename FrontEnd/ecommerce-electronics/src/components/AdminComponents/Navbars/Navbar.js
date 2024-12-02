@@ -59,9 +59,11 @@ const Header = () => {
       case '/admin/discount':
         return 'Discount Management';
       case '/admin/feedback':
-        return 'Feedback';
-      case '/admin/settings':
-        return 'Settings';
+        return 'Feedback Management';
+      case '/admin/order':
+        return 'Order Management';
+        case '/admin/product':
+        return 'Product Management';
       default:
         return 'Admin Dashboard';
     }

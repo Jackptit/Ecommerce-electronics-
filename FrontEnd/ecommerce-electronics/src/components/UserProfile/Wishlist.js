@@ -88,7 +88,7 @@ const Wishlist = () => {
                   ✕
                 </button>
                 <img
-                  src={product.image.split(",")[1]}
+                  src={product.image.split(",")[0]}
                   alt={product.name}
                   className="card-img-top"
                 />

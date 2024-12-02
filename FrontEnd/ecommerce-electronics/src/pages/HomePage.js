@@ -1,4 +1,8 @@
 import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  useLocation,
+} from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -17,9 +21,11 @@ import Livechat from "../components/Livechat";
 
 
 const Home = () => {
+
   const [currentPage, setCurrentPage] = useState(1); // Trạng thái trang hiện tại
   const [productsPerPage] = useState(28); // Số sản phẩm trên mỗi trang
-
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
   const settings = {
     dots: false,
     infinite: true,
@@ -43,6 +49,8 @@ const Home = () => {
     <>
       <Wrapper>
         <Livechat />
+        {isHomePage && <Livechat />}
+
         <SliderWrapper>
           <Slider {...settings}>
             <div className="img-slick">
