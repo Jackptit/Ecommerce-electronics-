@@ -28,16 +28,18 @@ import {
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useUserContext } from "../contexts/UserContext";
+import { getAccessToken } from "../utils/commonFunction";
 
 const NavbarComponent = () => {
   const { userState, dispatch, fetchUser } = useUserContext();
   const [userData, setUserData] = useState(userState?.user);
+  const token = getAccessToken();
   
   useEffect(() => {
     if (userState.user) {
       setUserData(userState.user);
     }
-  }, [userState.user]);
+  }, [userState.user, token]);
   return (
     <>
       <Navbar bg="warning" expand="lg" variant="light" sticky="top">

@@ -26,4 +26,23 @@ export const saveAccessToken = (token) => {
       return false;
     }
   };
+
+  // Lưu cartBuy vào localStorage
+export const saveCartBuy = (cartBuy) => {
+  if (cartBuy && Array.isArray(cartBuy)) {
+    localStorage.setItem('cartBuy', JSON.stringify(cartBuy));
+  }
+};
+
+// Lấy cartBuy từ localStorage
+export const getCartBuy = () => {
+  const cartBuy = localStorage.getItem('cartBuy');
+  return cartBuy ? JSON.parse(cartBuy) : [];
+};
+
+// Xóa cartBuy khỏi localStorage
+export const removeCartBuy = () => {
+  localStorage.removeItem('cartBuy');
+};
+
   
