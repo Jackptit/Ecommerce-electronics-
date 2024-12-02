@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Container, Row, Col, Form, Button, InputGroup } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, InputGroup, Modal } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { useCartContext } from "../contexts/Cart_Context";
 import { useAddressContext } from "../contexts/AddressContext";
 import { useUserContext } from "../contexts/UserContext";
@@ -10,6 +12,8 @@ import {
   saveCartBuy,
   removeCartBuy,
 } from "../utils/commonFunction";
+import ReactLoading from "react-loading";
+import moment from "moment-timezone";
 
 function PaymentPage() {
   const token = getAccessToken();
@@ -17,10 +21,22 @@ function PaymentPage() {
   const { addressState, fetchAddress } = useAddressContext();
   const { userState, dispatch, fetchUser } = useUserContext();
   const [cartBuyItem, setCartBuyItem] = useState([]);
+  const [totalDiscount, setTotalDiscount] = useState(0);
+  const [coupons, setCoupons] = useState([]);
+  const [currentCoupon, setCurrentCoupon] = useState("");
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const navigate = useNavigate();
+
+  const handleShow = () => setShowErrorModal(true);
+  const handleClose = () => setShowErrorModal(false);
 
   useEffect(() => {
     fetchAddress(token);
     fetchUser(token);
+    fetchCoupon(token);
   }, [token]);
 
   useEffect(() => {
@@ -35,6 +51,23 @@ function PaymentPage() {
     }
   }, [cartBuy]);
 
+  const fetchCoupon = async (token) => {
+    try {
+      if (!token) {
+        return;
+      }
+      const coupons = await axios.get("http://localhost:8080/api/coupon", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setCoupons(coupons.data);
+    } catch (error) {
+      console.log("Error fetching coupon:", error.status);
+    }
+  };
+
   const defaultAddress = addressState.address.find(
     (item) => item.isDefault === true
   );
@@ -46,8 +79,71 @@ function PaymentPage() {
     return total + itemTotal;
   }, 0);
 
+  const handleApplyCoupon = () => {
+    const coupon = coupons.find((item) => item.code === currentCoupon.trim());
+
+    if (!coupon) {
+      setErrors({
+        ...errors,
+        coupon: "Mã không hợp lệ, vui lòng sử dụng mã khuyến mãi khác!",
+      });
+      setCurrentCoupon('');
+      setTotalDiscount(0);
+      return;
+    }
+
+    if(moment(coupon.endTime).valueOf() < Date.now() < Date.now()){
+      setErrors({
+        ...errors,
+        coupon: "Mã khuyến mãi đã hết hạn, vui lòng chọn mã khuyến mãi khác!",
+      });
+      setCurrentCoupon('');
+      setTotalDiscount(0);
+      return;
+    }
+
+    // Tính tổng số tiền giảm giá
+    const discount = (totalAmount * coupon.discountPercent) / 100;
+    setTotalDiscount(discount);
+  };
+
+  const handleBuy = () => {
+    if(!phone || phone === null || phone === '' || phone === undefined){
+      handleShow();
+      return;
+    }
+    try {
+      setLoading(true);
+
+
+
+      setLoading(false);
+    } catch (error) {
+      console.log('error buy: ',error)
+      setLoading(false);
+    }
+  }
+
+  const handleNavigate = () =>{
+    navigate("/user-profile/user-info"); 
+    handleClose();
+  }
+
+  const loadingStyle = {
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    zIndex: 9999,
+  };
+
   return (
     <Container fluid className="mt-4 ">
+      {loading && (
+        <div style={loadingStyle}>
+          <ReactLoading type="spin" color="#00BFFF" height={50} width={50} />
+        </div>
+      )}
       <Row className="ms-5">
         {/* Thông tin giao hàng và thanh toán */}
         <Col lg={8} className="mb-4">
@@ -167,9 +263,19 @@ function PaymentPage() {
               <Form.Control
                 placeholder="Nhập mã khuyến mãi"
                 aria-label="Nhập mã khuyến mãi"
+                value={currentCoupon}
+                onChange={(e) => setCurrentCoupon(e.target.value)}
               />
-              <Button variant="outline-secondary">Áp dụng</Button>
+              <Button
+                variant="outline-secondary"
+                onClick={handleApplyCoupon}
+                disabled={!currentCoupon.trim()}
+              >
+                Áp dụng
+              </Button>
             </InputGroup>
+            {errors.coupon && <p className="text-danger me-1">{errors.coupon}</p>}
+
             <p className="text-muted">
               Mã giảm giá và phiếu mua hàng sẽ không thể dùng lại sau khi đã đặt
               mua hàng
@@ -192,7 +298,7 @@ function PaymentPage() {
             <Row className="mb-2">
               <Col xs={8}>Tổng khuyến mãi</Col>
               <Col xs={4} className="text-end text-danger fw-bold">
-                {100000}
+                {totalDiscount.toLocaleString("vi-VN")}
               </Col>
             </Row>
             <Row className="mb-2">
@@ -200,16 +306,34 @@ function PaymentPage() {
                 Tổng thanh toán
               </Col>
               <Col xs={4} className="text-end text-danger fw-bold">
-                {800000}
+                {(totalAmount - totalDiscount).toLocaleString("vi-VN")}
               </Col>
             </Row>
             <p className="text-muted">Đã bao gồm VAT (nếu có)</p>
-            <Button variant="primary" className="w-100">
+            <Button variant="primary" className="w-100" onClick={handleBuy} disabled={cartBuyItem.length < 1}>
               Xác nhận mua hàng
             </Button>
           </div>
         </Col>
       </Row>
+
+      {/* Modal hiển thị thông báo */}
+      <Modal show={showErrorModal} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Thông báo </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+         Tài khoản của bạn chưa xác minh số điện thoại, vui lòng thiết lập số điện thoại trước khi mua hàng!
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Hủy
+          </Button>
+          <Button variant="primary" onClick={handleNavigate} >
+            Thiết lập
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 }
