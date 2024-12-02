@@ -22,6 +22,7 @@ const Wishlist = () => {
       setUserData(userState.user);
     }
     const getAllFavouriteProduct = async () => {
+      if (!userData?.favourite) return [];
       const favouriteProductIDs = userData?.favourite
         .toString()
         .split(",")
@@ -60,12 +61,12 @@ const Wishlist = () => {
       if (response.status === 200) {
         dispatch({ type: "UPDATE_USER_INFO", payload: response.data });
         setUserData(response.data);
-        toast.success('Xóa sản phẩm yêu thích thành công !');
+        toast.success("Xóa sản phẩm yêu thích thành công !");
       }
       //
     } catch (error) {
       console.log(error);
-      toast.error('Có lỗi xảy ra vui long thử lại sau !')
+      toast.error("Có lỗi xảy ra vui long thử lại sau !");
     }
   };
 
@@ -73,42 +74,46 @@ const Wishlist = () => {
     <div className="container wishlist">
       <h2 className="my-4">Sản phẩm yêu thích</h2>
       <div className="row">
-        {favouriteProducts.map((product) => (
-          <div key={product.id} className="col-md-3 mb-4">
-            <div className="card position-relative">
-              {/* Nút Remove */}
-              <button
-                className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                onClick={() => handleRemove(product.id)}
-              >
-                ✕
-              </button>
-              <img
-                src={product.image.split(",")[1]}
-                alt={product.name}
-                className="card-img-top"
-              />
-              <div className="card-body">
-                <h5
-                  className="card-title"
-                  style={{
-                    display: "-webkit-box",
-                    WebkitLineClamp: 4,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
+        {favouriteProducts?.length == 0 ? (
+          <span>Chưa có sản phẩm yêu thích nào</span>
+        ) : (
+          favouriteProducts?.map((product) => (
+            <div key={product.id} className="col-md-3 mb-4">
+              <div className="card position-relative">
+                {/* Nút Remove */}
+                <button
+                  className="btn btn-sm btn-danger position-absolute top-0 end-0"
+                  onClick={() => handleRemove(product.id)}
                 >
-                  {product.name}
-                </h5>
-                <p className="card-text text-success">
-                  {product.price.toLocaleString("vi-VN")} ₫
-                </p>
-                <button className="btn btn-primary">Thêm vào giỏ</button>
+                  ✕
+                </button>
+                <img
+                  src={product.image.split(",")[1]}
+                  alt={product.name}
+                  className="card-img-top"
+                />
+                <div className="card-body">
+                  <h5
+                    className="card-title"
+                    style={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 4,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {product.name}
+                  </h5>
+                  <p className="card-text text-success">
+                    {product.price.toLocaleString("vi-VN")} ₫
+                  </p>
+                  <button className="btn btn-primary">Thêm vào giỏ</button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

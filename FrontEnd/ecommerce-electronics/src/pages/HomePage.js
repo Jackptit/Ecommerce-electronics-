@@ -8,12 +8,18 @@ import Headphone from "../assets/tai-nghe-sony-wf-c510-home.webp";
 import Phone from "../assets/tecno-spark-go-1-home.webp";
 import FeaturedProducts from "../components/FeaturedProducts";
 import { useReducer, useState } from "react";
+
 import { useProductContext } from "../contexts/Product_Context";
 import { Pagination } from "react-bootstrap";
+
+import Livechat from "../components/Livechat";
+
+
+
 const Home = () => {
   const [currentPage, setCurrentPage] = useState(1); // Trạng thái trang hiện tại
   const [productsPerPage] = useState(28); // Số sản phẩm trên mỗi trang
-  
+
   const settings = {
     dots: false,
     infinite: true,
@@ -23,8 +29,8 @@ const Home = () => {
     autoplay: true,
     autoplaySpeed: 3000,
   };
-  const {productState}=useProductContext();
-  console.log(productState.products);
+  const { productState } = useProductContext();
+  console.log("data product", productState.products);
   const totalPages = Math.ceil(productState.products.length / productsPerPage);
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -36,6 +42,7 @@ const Home = () => {
   return (
     <>
       <Wrapper>
+        <Livechat />
         <SliderWrapper>
           <Slider {...settings}>
             <div className="img-slick">
@@ -49,28 +56,29 @@ const Home = () => {
             </div>
           </Slider>
         </SliderWrapper>
-        <FeaturedProducts title={`Tất cả sản phẩm : ${productState.products.length} sản phẩm`} productList={currentProducts}/>
+        <FeaturedProducts title={`Tất cả sản phẩm : ${productState.products.length} sản phẩm`} productList={currentProducts} />
         <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-        <Pagination>
-          <Pagination.Prev
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          />
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
-            <Pagination.Item
-              key={pageNumber}
-              active={pageNumber === currentPage}
-              onClick={() => handlePageChange(pageNumber)}
-            >
-              {pageNumber}
-            </Pagination.Item>
-          ))}
-          <Pagination.Next
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          />
-        </Pagination>
-</div>
+          <Pagination>
+            <Pagination.Prev
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
+              <Pagination.Item
+                key={pageNumber}
+                active={pageNumber === currentPage}
+                onClick={() => handlePageChange(pageNumber)}
+              >
+                {pageNumber}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            />
+          </Pagination>
+        </div>
+
       </Wrapper>
     </>
   );

@@ -12,7 +12,6 @@ const initialState = {
 };
 export const ProductProvider = ({ children }) => {
   const [productState, dispatch] = useReducer(productReducer, initialState);
-  const token = getAccessToken();
   useEffect(() => {
     if (!productState.products && !productState.loading) {
       dispatch({ type: "LOADING" });
@@ -28,7 +27,7 @@ export const ProductProvider = ({ children }) => {
           },
         }
       )
-      console.log(response.data);
+      console.log("data được gọi:", response.data);
       saveProducts(JSON.stringify(response.data));
       dispatch({ type: "SET_PRODUCTS", payload: response.data });
       return response.data

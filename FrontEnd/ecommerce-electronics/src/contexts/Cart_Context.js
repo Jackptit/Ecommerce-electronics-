@@ -7,12 +7,14 @@ const init = {
     cart: [],
     total: 0,
     amount: 0,
-
+    loading: false,
+    error: null
 }
 const Cart_Context = React.createContext();
 export const CartProvider = ({ children }) => {
     const [cartBuy, setCartBuy] = useState([]);
     const [state, dispatch] = useReducer(Cart_Reducer, init);
+
     const addToCart = (product) => {
         dispatch({ type: 'ADD_TO_CART', payload: product });
     }
@@ -29,20 +31,8 @@ export const CartProvider = ({ children }) => {
         dispatch({ type: 'COUNT_CART_TOTALS' });
     }
     useEffect(() => {
-       
+
     }, [state]);
-    const fetchCart= async (accessToken)=>{
-        try {
-            if (!accessToken) {
-              dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
-              return;
-            }
-        }
-        catch (error) {
-            console.error("Error fetching cart:", error);
-            
-        }
-    }
     return (
         <Cart_Context.Provider value={{ ...state, cartBuy, setCartBuy, addToCart, increaseQuantity, decreaseQuantity, removeItem, countCartTotals }}>
             {children}

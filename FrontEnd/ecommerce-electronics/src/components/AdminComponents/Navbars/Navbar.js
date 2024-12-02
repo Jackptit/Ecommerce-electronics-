@@ -1,12 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaUserCircle } from 'react-icons/fa'; // Icon User
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate  } from 'react-router-dom';
 import './Navbar.css';
+import { useUserContext } from "../../../contexts/UserContext"; // Import context
+import { removeAccessToken } from '../../../utils/commonFunction';
 
 const Header = () => {
+  const { userState, dispatch, updateUser } = useUserContext();
+  const [userData, setUserData] = useState(userState?.user);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
   const dropdownRef = useRef(null);  // Tham chiếu đến dropdown
+  const navigate = useNavigate(); 
+
+  useEffect(() => {
+    // Update userData if state.user changes
+    if (userState.user) {
+      if(userState?.user?.idRole !== 1)
+        navigate("/login", { replace: true });
+      setUserData(userState.user);
+    }
+  }, [userState.user]);
 
   // Hàm toggle dropdown
   const toggleDropdown = (e) => {
@@ -20,6 +34,11 @@ const Header = () => {
       setDropdownOpen(false);
     }
   };
+
+  const handleLogout = () => {
+    removeAccessToken();
+    navigate("/login", { replace: true }); // Sử dụng navigate hook để chuyển hướng
+  }
 
   // Thêm event listener khi dropdown mở và xóa khi dropdown đóng
   useEffect(() => {
@@ -55,7 +74,7 @@ const Header = () => {
       </div>
       <div className="user-info">
         <FaUserCircle size={30} />
-        <span>John Doe</span>
+        <span>{userData?.username}</span>
         <button onClick={toggleDropdown} className="user-info-button">
           <i className="dropdown-icon">▼</i> {/* Nút dropdown */}
         </button>
@@ -65,7 +84,7 @@ const Header = () => {
         >
           <ul>
             <li>Profile</li>
-            <li>Logout</li>
+            <li onClick={handleLogout}>Logout</li>
           </ul>
         </div>
       </div>

@@ -2,13 +2,24 @@ import React, { useState, useEffect } from "react";
 import { useAddressContext } from "../../contexts/AddressContext";
 import AddAddressModal from "./Model/AddAddressModal";
 import { toast } from "react-toastify"; // Import toast
+import { getAccessToken } from "../../utils/commonFunction";
 
 const AddressList = () => {
-  const { addressState, dispatch, updateAddress, addAddress, deleteAddress } =
-    useAddressContext();
+  const {
+    addressState,
+    dispatch,
+    updateAddress,
+    addAddress,
+    deleteAddress,
+    fetchAddress,
+  } = useAddressContext();
   const [addresses, setAddresses] = useState(addressState?.address);
   const [showModal, setShowModal] = useState(false);
   const [currentAddress, setCurrentAddress] = useState(null); // Store current address for update
+
+  useEffect(() => {
+    fetchAddress(getAccessToken());
+  }, []);
 
   useEffect(() => {
     if (addressState.address) {
@@ -37,8 +48,6 @@ const AddressList = () => {
     setCurrentAddress(address); // Set the address to be edited
     setShowModal(true);
   };
-
-
 
   const handleAddAddress = async (newAddress) => {
     try {
@@ -103,7 +112,15 @@ const AddressList = () => {
               key={addr.id}
               className="list-group-item d-flex justify-content-between align-items-center"
             >
-              <span>
+              <span
+                style={{
+                  display: "inline-block",
+                  maxWidth: "500px",
+                  whiteSpace: "normal",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
+                }}
+              >
                 {addr.specificAddress}, {addr.ward}, {addr.district},{" "}
                 {addr.province}
               </span>

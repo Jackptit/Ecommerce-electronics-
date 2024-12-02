@@ -64,7 +64,9 @@ const AuthForm = () => {
 
   const handleGetUserData = async (accessToken) => {
     const user = await fetchUser(accessToken);
+
     console.log('user', user)
+
     await fetchAddress(accessToken);
     if (user.idRole === 1) {
       navigate('/admin');

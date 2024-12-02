@@ -24,8 +24,8 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
-          <Link to="/admin/settings">
-            <i className="fas fa-cogs"></i> <strong>Settings</strong>
+          <Link to="/admin/order">
+            <i className="fas fa-shopping-cart"></i> <strong>Orders</strong>
           </Link>
         </li>
       </ul>

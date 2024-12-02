@@ -6,7 +6,8 @@ import formatDate from "../../utils/dateFormat";
 import { getAccessToken } from "../../utils/commonFunction";
 
 const OrderHistory = () => {
-  const { ordersState, dispatch, fetchOrders, updateFeedbackStatus } = useOrdersContext();
+  const { ordersState, dispatch, fetchOrders, updateFeedbackStatus } =
+    useOrdersContext();
   const [ordersData, setOrders] = useState(ordersState?.orders);
   const token = getAccessToken();
 
@@ -63,19 +64,21 @@ const OrderHistory = () => {
     setRating(e.target.value);
   };
 
-
-  
-
   const handleSubmitReview = async (e) => {
     e.preventDefault();
 
     const reviewData = {
-      idProduct: selectedItem?.product.id, 
+      idProduct: selectedItem?.product.id,
       star: rating,
       description: review,
     };
 
-    await updateFeedbackStatus(token, reviewData, selectedItem?.idOrder, selectedItem?.idProduct);
+    await updateFeedbackStatus(
+      token,
+      reviewData,
+      selectedItem?.idOrder,
+      selectedItem?.idProduct
+    );
     handleCloseModal();
   };
 
@@ -90,89 +93,93 @@ const OrderHistory = () => {
   return (
     <div>
       <h3 className="mb-4">Lịch sử mua sắm</h3>
-      {ordersData?.map((order) => (
-        <div key={order.id} className="card mb-3">
-          <div className="card-header d-flex justify-content-between align-items-center">
-            <span>
-              <strong>Mã đơn hàng:</strong> {order.code}
-            </span>
-            <span>
-              <strong>Ngày mua:</strong> {formatDate(order.orderTime)}
-            </span>
-          </div>
-          <div className="card-body">
-            <p>
-              <strong>
-                Tổng tiền: {order.total.toLocaleString("vi-VN")} ₫
-              </strong>
-            </p>
-            <p>
-              <strong>Trạng thái:</strong>
-              <span
-                style={{
-                  color:
-                    order.status === 1
-                      ? "green"
-                      : order.status === 2
-                      ? "gray"
-                      : "red",
-                  marginLeft: "10px",
-                }}
-              >
-                <strong>
-                  <i>{convertStatus(order.status)}</i>
-                </strong>
+      {ordersData?.length === 0 ? (
+        <span>Bạn chưa có đơn hàng nào</span>
+      ) : (
+        ordersData?.map((order) => (
+          <div key={order.id} className="card mb-3">
+            <div className="card-header d-flex justify-content-between align-items-center">
+              <span>
+                <strong>Mã đơn hàng:</strong> {order.code}
               </span>
-            </p>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Hình ảnh</th>
-                  <th>Sản phẩm</th>
-                  <th>Số lượng</th>
-                  <th>Giá</th>
-                  <th>Đánh giá sản phẩm</th>
-                </tr>
-              </thead>
-              <tbody>
-                {order.orderDetails.map((item, index) => (
-                  <tr key={index}>
-                    <td>
-                      <img
-                        src={"https:" + item.product.image.split(",")[1]}
-                        alt={"image"}
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                          borderRadius: "5px",
-                        }}
-                      />
-                    </td>
-                    <td className="fixed-width">{item.product.name}</td>
-                    <td>{item.quantity}</td>
-                    <td>{item.productPrice.toLocaleString("vi-VN")} ₫</td>
-                    <td>
-                      {item.isFeedback ? (
-                        <span className="feedback-checked">Đã đánh giá</span>
-                      ) : (
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          style={{ width: "120px" }}
-                          onClick={() => handleReviewClick(item)}
-                        >
-                          Đánh giá ngay
-                        </Button>
-                      )}
-                    </td>
+              <span>
+                <strong>Ngày mua:</strong> {formatDate(order.orderTime)}
+              </span>
+            </div>
+            <div className="card-body">
+              <p>
+                <strong>
+                  Tổng tiền: {order.total.toLocaleString("vi-VN")} ₫
+                </strong>
+              </p>
+              <p>
+                <strong>Trạng thái:</strong>
+                <span
+                  style={{
+                    color:
+                      order.status === 1
+                        ? "green"
+                        : order.status === 2
+                        ? "gray"
+                        : "red",
+                    marginLeft: "10px",
+                  }}
+                >
+                  <strong>
+                    <i>{convertStatus(order.status)}</i>
+                  </strong>
+                </span>
+              </p>
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Hình ảnh</th>
+                    <th>Sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Giá</th>
+                    <th>Đánh giá sản phẩm</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {order.orderDetails.map((item, index) => (
+                    <tr key={index}>
+                      <td>
+                        <img
+                          src={"https:" + item.product.image.split(",")[1]}
+                          alt={"image"}
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            objectFit: "cover",
+                            borderRadius: "5px",
+                          }}
+                        />
+                      </td>
+                      <td className="fixed-width">{item.product.name}</td>
+                      <td>{item.quantity}</td>
+                      <td>{item.productPrice.toLocaleString("vi-VN")} ₫</td>
+                      <td>
+                        {item.isFeedback ? (
+                          <span className="feedback-checked">Đã đánh giá</span>
+                        ) : (
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            style={{ width: "120px" }}
+                            onClick={() => handleReviewClick(item)}
+                          >
+                            Đánh giá ngay
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      )}
 
       {/* Modal đánh giá */}
       <Modal show={showModal} onHide={handleCloseModal}>
