@@ -13,14 +13,19 @@ const Sidebar = () => {
 
 
       <ul>
+      <li>
+          <Link to="/admin/product">
+            <i className="fas fa-box"></i><strong>Products</strong> 
+          </Link>
+        </li>
         <li>
           <Link to="/admin/discount">
-            <i className="fas fa-tags"></i><strong>Discount</strong> 
+            <i className="fas fa-tags"></i><strong>Discounts</strong> 
           </Link>
         </li>
         <li>
           <Link to="/admin/feedback">
-            <i className="fas fa-comment-dots"></i> <strong>Feedback</strong>
+            <i className="fas fa-comment-dots"></i> <strong>Feedbacks</strong>
           </Link>
         </li>
         <li>

@@ -1,4 +1,8 @@
 import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  useLocation,
+} from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -12,6 +16,10 @@ import Livechat from "../components/Livechat";
 
 
 const Home = () => {
+
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
   
   const settings = {
     dots: false,
@@ -25,7 +33,7 @@ const Home = () => {
   return (
     <>
       <Wrapper>
-      <Livechat/>
+      {isHomePage && <Livechat/>}
         <SliderWrapper>
           <Slider {...settings}>
             <div className="img-slick">

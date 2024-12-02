@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import DiscountModal from "../../../components/AdminComponents/Modal/DiscountModal";
 import { getAccessToken } from "../../../utils/commonFunction";
 import axios from "axios";
 import formatDate from "../../../utils/dateFormat";

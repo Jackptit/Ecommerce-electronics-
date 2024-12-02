@@ -97,3 +97,19 @@
 .nav-pills .nav-link:hover {
   background-color: #f0f8ff;
 } */
+
+
+.custom-checkbox input[type="checkbox"] {
+  width: 20px; /* Tùy chỉnh kích thước */
+  height: 20px;
+  border: 1px solid #000; /* Màu viền */
+  border-radius: 25px; /* Góc bo tròn */
+  appearance: none; /* Loại bỏ kiểu mặc định */
+  cursor: pointer;
+}
+
+.custom-checkbox input[type="checkbox"]:checked {
+  background-color: #007bff; /* Màu nền khi được chọn */
+  border-color: #007bff; /* Màu viền khi được chọn */
+  content: "✓"; /* Hoặc tùy chỉnh dấu check */
+}
