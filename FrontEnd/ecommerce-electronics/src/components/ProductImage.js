@@ -1,21 +1,21 @@
 import React from "react";
 import styled from "styled-components";
 
-function ProductImage({ images = [{ url: "" }] }) {
-  const [image, setImage] = React.useState(images[0].url);
+function ProductImage({ images  }) {
+  const [image, setImage] = React.useState(images[0]);
   return (
     <div>
       <ImageWrapper>
         <img src={image} alt="Product" />
       </ImageWrapper>
       <ThumbnailWrapper>
-        {images.map((image, index) => {
+        {images.map((image, index) => {    
           return (
             <Thumbnail
-              src={image.url}
+              src={image}
               key={index}
               alt="Thumbnail"
-              onClick={() => setImage(image.url)} />
+              onClick={() => setImage(image)} />
           )
         })}
       </ThumbnailWrapper>

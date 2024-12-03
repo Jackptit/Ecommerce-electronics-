@@ -134,7 +134,7 @@ const Cart_Reducer = (state, action) => {
 
     case "REMOVE_ALL_ITEM_CART_BUY":
       return { ...state, cartBuy: [] };
-      
+
     default:
       return state;
   }

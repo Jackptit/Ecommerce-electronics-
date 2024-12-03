@@ -7,7 +7,6 @@ const UserInfo = () => {
   const { userState, dispatch, updateUser } = useUserContext();
   const [userData, setUserData] = useState(userState?.user);
   const [isEditing, setIsEditing] = useState(false);
-
   useEffect(() => {
     // Update userData if state.user changes
     if (userState.user) {

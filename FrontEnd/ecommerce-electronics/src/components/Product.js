@@ -3,35 +3,71 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useCartContext } from '../contexts/Cart_Context';
 import { ToastContainer, toast } from 'react-toastify';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart as solidHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons";
+import { useState } from "react";
+import { Col, Row } from 'react-bootstrap';
+
 const Product = (product) => {
     const { addToCart, countCartTotals } = useCartContext();
     const handleBuyNow = () => {
         // Gọi hàm addToCart (thêm sản phẩm vào giỏ hàng)
         addToCart(product);
         countCartTotals();
-
         // Hiển thị thông báo toast
         toast.success("Sản phẩm đã được thêm vào giỏ hàng!");
-    };
+    }; 
+    const [hovered, setHovered] = useState(false);
+    const toggleFavorite = () => {}
+    const images=product.image.split(',');
+    const imageMain=images[0];
     return (
         <>
             <ProductWrapper>
                 <div className="container">
-                    <Link to={`/product/${product.id}`} className='link'>
-                        <img src={product.image} alt={product.name} />
+                    <Link to={`/product/${product.id}`} 
+                     state={{ productData: product }}
+                     className='link'>
+                    <div className='image-link'>
+                        <img src={imageMain} alt={product.name} />
+                    </div>
                     </Link>
                     <span className='w-tag'>Phone</span>
                     <span className='w-tag'>256gb</span>
                     <footer>
-                        <Link to={`/product/${product.id}`} className='link'>
+                        <Link
+                        to={`/product/${product.id}`}
+                        state={{ productData: product }}
+                            className='link'>
                             <p className='w-name' style={{
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                             }}>{product.name}</p>
                         </Link>
-                        <p className='w-price'>{product.price}</p>
+                        <p className='w-price'>Giá chỉ còn: {product.price}</p>
+                        <p>Gía gốc:                           
+                            <del className='w-price'> {product.price}</del>
+                        </p>
+                        <button
+                            style={{
+                                border: "none",
+                                background: "none",
+                                cursor: "pointer",
+                                fontSize: "18px",
+                                color: hovered  ? "red" : "gray",
+                            }}
+                            onClick={toggleFavorite}
+                            onMouseEnter={() => setHovered(true)}
+                            onMouseLeave={() => setHovered(false)}
+                            >
+                            <FontAwesomeIcon icon={regularHeart} />Yêu thích
+                            </button>
                         <button className='buy-now' onClick={handleBuyNow}>Thêm vào giỏ hàng</button>
+                       
+                        
+                          
 
                     </footer>
                 </div>
@@ -90,7 +126,7 @@ const ProductWrapper = styled.article`
         /* Đệm trên 0.5rem */
     }
     .buy-now {
-        background-color: #70d6f4; /* Màu nền xanh dương */
+        background-color: #c8d421; /* Màu nền xanh dương */
         color: black; /* Màu chữ trắng */
         border: none; /* Không viền */
       
@@ -100,11 +136,15 @@ const ProductWrapper = styled.article`
         border-radius: 5px; /* Bo tròn góc */
         transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu nền */
         display: block; /* Đặt button thành block để margin:auto có tác dụng */
+        
         margin: 10px auto; /* Căn giữa button trên trục ngang */
     }
 
     .buy-now:hover {
-        background-color: rgba(0, 248, 147, 0.44); /* Màu nền khi hover */
+        background-color: #df1818; /* Màu nền khi hover */
+    }
+    .image-link{
+        height:150px;
     }
 `;
-export default Product;
+export default Product ;

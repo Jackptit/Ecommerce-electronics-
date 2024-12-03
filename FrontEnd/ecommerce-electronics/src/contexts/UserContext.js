@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import axios from "axios";
 import { getAccessToken } from "../utils/commonFunction";
-import userReducer from "../reducers/UserReducer";
+import userReducer from "../reducers/userReducer";
 import { useAuthContext } from "./Auth_Context";
 import { useAddressContext } from "./AddressContext";
 
@@ -23,7 +23,7 @@ const initialState = {
 // Provider component
 export const UserProvider = ({ children }) => {
   const [userState, dispatch] = useReducer(userReducer, initialState);
-  const  token  = getAccessToken();
+  const token = getAccessToken();
   //const { addressState, fetchAddress } = useAddressContext();
 
   if (!token) {

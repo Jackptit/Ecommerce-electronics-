@@ -22,7 +22,7 @@ const initialState = {
 // Provider component
 export const AddressProvider = ({ children }) => {
   const [addressState, dispatch] = useReducer(addressReducer, initialState);
-  const  token  = getAccessToken();
+  const token = getAccessToken();
 
   if (!token) {
     //navigate to login
@@ -50,7 +50,7 @@ export const AddressProvider = ({ children }) => {
       });
 
       //if(response.ok)
-        dispatch({ type: "SET_ADDRESS", payload: response.data });
+      dispatch({ type: "SET_ADDRESS", payload: response.data });
     } catch (error) {
       console.error("Error fetching address:", error);
       dispatch({ type: "ERROR", payload: error.message });
@@ -67,7 +67,7 @@ export const AddressProvider = ({ children }) => {
 
       const response = await axios.put(
         "http://localhost:8080/api/address",
-        address, 
+        address,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -76,7 +76,7 @@ export const AddressProvider = ({ children }) => {
         }
       );
 
-      if(setIsDefault)
+      if (setIsDefault)
         dispatch({ type: "UPDATE_DEFAULT_ADDRESS", payload: response.data });
       else
         dispatch({ type: "UPDATE_ADDRESS", payload: response.data });
@@ -90,16 +90,18 @@ export const AddressProvider = ({ children }) => {
 
   const addAddress = async (address) => {
     try {
-      const token  = getAccessToken();
-      if (!token) {  
+
+      const token = getAccessToken();
+      if (!token) {
+
         dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
         return;
       }
-  
+
       dispatch({ type: "LOADING" });
-  
+
       const response = await axios.post(
-        "http://localhost:8080/api/address", 
+        "http://localhost:8080/api/address",
         address,
         {
           headers: {
@@ -109,30 +111,30 @@ export const AddressProvider = ({ children }) => {
         }
       );
       console.log("adđ", response.data)
-  
+
       dispatch({ type: "ADD_ADDRESS", payload: response.data });
-     
+
       return response; // Trả về response từ API
     } catch (error) {
       console.error("Error adding address:", error);
       dispatch({ type: "ERROR", payload: error.message });
     }
   };
-  
+
   const deleteAddress = async (id) => {
     try {
       if (!token) {
         dispatch({ type: "ERROR", payload: "Access token not found" }); // Không có access token
         return;
       }
-  
+
       const response = await axios.delete(`http://localhost:8080/api/address/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-  
+
       // Xóa địa chỉ thành công, cập nhật lại danh sách địa chỉ
       dispatch({ type: "DELETE_ADDRESS", payload: id });
     } catch (error) {
@@ -140,12 +142,12 @@ export const AddressProvider = ({ children }) => {
       dispatch({ type: "ERROR", payload: error.message });
     }
   };
-  
-  
+
+
 
   return (
     <AddressContext.Provider
-      value={{ addressState, dispatch, fetchAddress, updateAddress, addAddress, deleteAddress}}
+      value={{ addressState, dispatch, fetchAddress, updateAddress, addAddress, deleteAddress }}
     >
       {children}
     </AddressContext.Provider>

@@ -12,9 +12,12 @@ import { UserProvider } from "./contexts/UserContext";
 import { AddressProvider } from "./contexts/AddressContext";
 import { OrdersProvider } from "./contexts/OrderContext";
 import { ToastContainer, toast } from "react-toastify";
+import { ProductProvider } from "./contexts/Product_Context";
+import Product from "./components/Product";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
+  <ProductProvider>
     <AuthProvider>
       <AddressProvider>
         <UserProvider>
@@ -27,6 +30,7 @@ root.render(
         </UserProvider>
       </AddressProvider>
     </AuthProvider>
+    </ProductProvider>
   </React.StrictMode>
 );
 

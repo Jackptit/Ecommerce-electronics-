@@ -66,6 +66,7 @@ const CartPage = () => {
       unSelectAllCartItem();
     }
   };
+  console.log("cart", cart)
   return (
     <Container style={{ height: cart.length === 0 ? "500px" : "auto" }}>
       <h2 className="text-center mb-4">Giỏ hàng</h2>
@@ -113,9 +114,8 @@ const CartPage = () => {
               </p> */}
               <Link
                 to={cartBuy.length > 0 ? "/payment" : "#"}
-                className={`text-decoration-none ${
-                  cartBuy.length === 0 && "disabled-link"
-                }`}
+                className={`text-decoration-none ${cartBuy.length === 0 && "disabled-link"
+                  }`}
               >
                 <Button
                   variant="primary"
