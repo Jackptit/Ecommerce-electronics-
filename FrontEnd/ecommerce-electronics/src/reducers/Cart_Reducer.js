@@ -5,29 +5,54 @@ const Cart_Reducer = (state, action) => {
         ...state,
         cart: action.payload,
       };
-    case "ADD_TO_CART":
-      //const updatedCart = [...state.cart, action.payload];
-      const itemIndex = state.cart.findIndex((item) => {
-        return item.id === action.payload.id;
-      });
-      const updatedAmount = state.amount + 1; // Assuming each product adds 1 to the amount
-      if (itemIndex === -1) {
-        return {
-          ...state,
-          amount: updatedAmount,
-          cart: [...state.cart, { ...action.payload, quantity: 1 }],
-        };
-      }
-      const updateCart = state.cart.map((item) =>
-        item.id === action.payload.id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      );
-      return {
-        ...state,
-        amount: updatedAmount,
-        cart: updateCart,
-      };
+
+      case "ADD_TO_CART": {
+        // Xử lý cart
+        const existingCartProductIndex = state.cart.findIndex(
+            (item) => item.product.id === action.payload.product.id
+        );
+    
+        let cartAfterAdd;
+        if (existingCartProductIndex !== -1) {
+            // Nếu sản phẩm đã có trong cart, tăng số lượng
+            cartAfterAdd = state.cart.map((item, index) =>
+                index === existingCartProductIndex
+                    ? { ...item, quantity: item.quantity + 1 }
+                    : item
+            );
+        } else {
+            // Nếu sản phẩm chưa có, thêm mới và đặt số lượng là 1
+            cartAfterAdd = [...state.cart, { ...action.payload, quantity: 1 }];
+        }
+    
+        // Xử lý cartBuy với điều kiện user.id và product.id
+        const existingCartBuyProductIndex = state.cartBuy.findIndex((item) => {
+            return (
+                item.user.id === action.payload.user.id &&
+                item.product.id === action.payload.product.id
+            );
+        });
+    
+        let cartBuyAfterAdd;
+        if (existingCartBuyProductIndex !== -1) {
+            // Nếu sản phẩm đã có trong cartBuy, tăng số lượng
+            cartBuyAfterAdd = state.cartBuy.map((item, index) =>
+                index === existingCartBuyProductIndex
+                    ? { ...item, quantity: item.quantity + 1 }
+                    : item
+            );
+        } else {
+            // Nếu sản phẩm chưa có, thêm mới và đặt số lượng là 1
+            cartBuyAfterAdd = [
+                ...state.cartBuy,
+                { ...action.payload, quantity: 1 },
+            ];
+        }
+    
+        return { ...state, cart: cartAfterAdd, cartBuy: cartBuyAfterAdd };
+    }
+    
+
     case "INCREASE_QUANTITY":
       const tempCart = state.cart.map((item) => {
         if (
@@ -134,6 +159,16 @@ const Cart_Reducer = (state, action) => {
 
     case "REMOVE_ALL_ITEM_CART_BUY":
       return { ...state, cartBuy: [] };
+
+    case "PAYMENT": {
+      const cartAfterAdd = state.cart.filter(
+        (item) =>
+          !action.payload.some(
+            (cartbuy) => cartbuy.product.id === item.product.id
+          )
+      );
+      return { ...state, cart: cartAfterAdd, cartBuy: [] };
+    }
 
     default:
       return state;

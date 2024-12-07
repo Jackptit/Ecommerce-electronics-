@@ -84,9 +84,9 @@ const OrderHistory = () => {
 
   const convertStatus = (status) => {
     return status == 1
-      ? "Đã thanh toán"
+      ? "Thành công"
       : status == 2
-      ? "Chờ thanh toán"
+      ? "Chờ xác nhận"
       : "Đã Hủy";
   };
 

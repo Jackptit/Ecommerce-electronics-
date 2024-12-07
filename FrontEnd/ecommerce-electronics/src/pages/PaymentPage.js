@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Container, Row, Col, Form, Button, InputGroup, Modal } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  InputGroup,
+  Modal,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useCartContext } from "../contexts/Cart_Context";
@@ -14,10 +22,11 @@ import {
 } from "../utils/commonFunction";
 import ReactLoading from "react-loading";
 import moment from "moment-timezone";
+import PaymentSuccessModal from "../components/UserProfile/Model/PaymentSuccessModal";
 
 function PaymentPage() {
   const token = getAccessToken();
-  const { cartBuy } = useCartContext();
+  const { cartBuy, payment } = useCartContext();
   const { addressState, fetchAddress } = useAddressContext();
   const { userState, dispatch, fetchUser } = useUserContext();
   const [cartBuyItem, setCartBuyItem] = useState([]);
@@ -26,6 +35,8 @@ function PaymentPage() {
   const [currentCoupon, setCurrentCoupon] = useState("");
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("MoMo");
+  const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
 
   const [showErrorModal, setShowErrorModal] = useState(false);
   const navigate = useNavigate();
@@ -68,6 +79,10 @@ function PaymentPage() {
     }
   };
 
+  const handlePaymentMethodChange = (e) => {
+    setPaymentMethod(e.target.value);
+  };
+
   const defaultAddress = addressState.address.find(
     (item) => item.isDefault === true
   );
@@ -87,17 +102,17 @@ function PaymentPage() {
         ...errors,
         coupon: "Mã không hợp lệ, vui lòng sử dụng mã khuyến mãi khác!",
       });
-      setCurrentCoupon('');
+      setCurrentCoupon("");
       setTotalDiscount(0);
       return;
     }
 
-    if(moment(coupon.endTime).valueOf() < Date.now() < Date.now()){
+    if (moment(coupon.endTime).valueOf() < Date.now() ) {
       setErrors({
         ...errors,
         coupon: "Mã khuyến mãi đã hết hạn, vui lòng chọn mã khuyến mãi khác!",
       });
-      setCurrentCoupon('');
+      setCurrentCoupon("");
       setTotalDiscount(0);
       return;
     }
@@ -107,27 +122,79 @@ function PaymentPage() {
     setTotalDiscount(discount);
   };
 
-  const handleBuy = () => {
-    if(!phone || phone === null || phone === '' || phone === undefined){
+  const handleBuy = async () => {
+    if (!phone || phone === null || phone === "" || phone === undefined) {
       handleShow();
       return;
     }
     try {
       setLoading(true);
 
+      if((totalAmount - totalDiscount) > 50000000 && paymentMethod === 'MoMo'){
+        alert("MoMo chỉ cho phép thanh toán tối đa 50.000.000đ cho mỗi đơn hàng. Vui lòng điều chỉnh số lượng hoặc chọn sản phẩm khác!!");
+        setLoading(false);
+        return;
+      }
+      //data send to server
+      const paymentData = {
+        cartDetailDtoList: cartBuy,
+        couponCode: currentCoupon,
+        paymentMethod: paymentMethod,
+        total: totalAmount,
+        totalDiscount: totalDiscount,
+        finalTotal: totalAmount - totalDiscount,
+        address:
+          defaultAddress?.specificAddress +
+          ", " +
+          defaultAddress?.ward +
+          ", " +
+          defaultAddress?.district +
+          ", " +
+          defaultAddress?.province,
+      };
 
+      if (!token) {
+        alert("Bạn đã hết phiên đăng nhập, vui lòng đăng nhập lại!");
+        navigate("/login");
+        return;
+      }
 
+      const response = await axios.post(
+        "http://localhost:8080/api/orders",
+        paymentData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      removeCartBuy();
+      payment(cartBuy);  //update state
+      if(paymentMethod === "COD")
+        setIsPaymentSuccess(true);
       setLoading(false);
+
+      if(paymentMethod === "MoMo"){  
+         const momoUrl = response.data.urlPayment
+         window.location.href = momoUrl
+      }
+        
     } catch (error) {
-      console.log('error buy: ',error)
+      console.log("error buy: ", error);
       setLoading(false);
     }
-  }
+  };
 
-  const handleNavigate = () =>{
-    navigate("/user-profile/user-info"); 
+  const handleNavigate = () => {
+    navigate("/user-profile/user-info");
     handleClose();
-  }
+  };
+
+  const handleCloseModal = () => {
+    setIsPaymentSuccess(false);
+  };
 
   const loadingStyle = {
     position: "fixed",
@@ -238,12 +305,16 @@ function PaymentPage() {
                 type="radio"
                 label="Thanh toán bằng chuyển khoản"
                 name="paymentMethod"
+                value="MoMo"
                 defaultChecked
+                onChange={handlePaymentMethodChange}
               />
               <Form.Check
                 type="radio"
                 label="Thanh toán khi nhận hàng"
                 name="paymentMethod"
+                value="COD"
+                onChange={handlePaymentMethodChange}
               />
             </Form.Group>
             <hr></hr>
@@ -274,7 +345,9 @@ function PaymentPage() {
                 Áp dụng
               </Button>
             </InputGroup>
-            {errors.coupon && <p className="text-danger me-1">{errors.coupon}</p>}
+            {errors.coupon && (
+              <p className="text-danger me-1">{errors.coupon}</p>
+            )}
 
             <p className="text-muted">
               Mã giảm giá và phiếu mua hàng sẽ không thể dùng lại sau khi đã đặt
@@ -310,7 +383,12 @@ function PaymentPage() {
               </Col>
             </Row>
             <p className="text-muted">Đã bao gồm VAT (nếu có)</p>
-            <Button variant="primary" className="w-100" onClick={handleBuy} disabled={cartBuyItem.length < 1}>
+            <Button
+              variant="primary"
+              className="w-100"
+              onClick={handleBuy}
+              disabled={cartBuyItem.length < 1}
+            >
               Xác nhận mua hàng
             </Button>
           </div>
@@ -323,17 +401,31 @@ function PaymentPage() {
           <Modal.Title>Thông báo </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-         Tài khoản của bạn chưa xác minh số điện thoại, vui lòng thiết lập số điện thoại trước khi mua hàng!
+          Tài khoản của bạn chưa xác minh số điện thoại, vui lòng thiết lập số
+          điện thoại trước khi mua hàng!
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Hủy
           </Button>
-          <Button variant="primary" onClick={handleNavigate} >
+          <Button variant="primary" onClick={handleNavigate}>
             Thiết lập
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <PaymentSuccessModal
+        open={isPaymentSuccess}
+        onClose={handleCloseModal}
+        toCart={() => {
+          handleCloseModal();
+          navigate("/cart");
+        }}
+        toOrders={() => {
+          handleCloseModal();
+          navigate("/user-profile/order-history");
+        }}
+      />
     </Container>
   );
 }

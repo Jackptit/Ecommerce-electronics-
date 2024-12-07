@@ -4,7 +4,7 @@ const Livechat = () => {
   useEffect(() => {
     const script = document.createElement("script");
     script.async = true;
-    script.src = 'https://embed.tawk.to/674dcd3a4304e3196aeb6702/1ie3ujbv6';
+    script.src = 'https://embed.tawk.to/675454c14304e3196aee4690/1iegmm5mc';
     script.charset = 'UTF-8';
     script.setAttribute('crossorigin', '*');
     document.body.appendChild(script);
@@ -14,6 +14,8 @@ const Livechat = () => {
 };
 
 export default Livechat;
+
+
 
 
 

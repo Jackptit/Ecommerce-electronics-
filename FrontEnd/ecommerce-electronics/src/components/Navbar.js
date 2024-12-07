@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Offcanvas from 'react-bootstrap/Offcanvas';
+import Offcanvas from "react-bootstrap/Offcanvas";
 import axios from "axios";
 import { ListGroup } from "react-bootstrap";
 import { saveCategories, getProducts } from "../utils/commonFunction";
@@ -34,44 +34,54 @@ import {
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useUserContext } from "../contexts/UserContext";
+import { useCartContext } from "../contexts/Cart_Context";
 import { getAccessToken } from "../utils/commonFunction";
 
 const NavbarComponent = () => {
   const { userState, dispatch, fetchUser } = useUserContext();
+  const { cart } = useCartContext();
   const [userData, setUserData] = useState(userState?.user);
+  const [cartData, setCartData] = useState(cart);
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [searchQuery, setSearchQuery] = useState(""); // State để lưu giá trị tìm kiếm
   const [suggestions, setSuggestions] = useState([]); // State để lưu danh sách gợi ý
+
   const token = getAccessToken();
   useEffect(() => {
     if (userState.user) {
       setUserData(userState.user);
     }
   }, [userState.user, token]);
+  useEffect(() => {
+    if (cart) {
+      setCartData(cart);
+    }
+  }, [cart, token]);
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/category", { headers: { "Content-Type": "application/json" } });
+        const response = await axios.get("http://localhost:8080/api/category", {
+          headers: { "Content-Type": "application/json" },
+        });
         console.log(response.data);
         saveCategories(response.data);
         setCategories(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-
-    }
+    };
     fetchData();
-  }, [])
+  }, []);
   const products = JSON.parse(getProducts());
   const listnameProduct = [];
   {
-    products.map((product) => {
+    products?.map((product) => {
       listnameProduct.push(product.name);
-    })
+    });
   }
   // Hàm xử lý sự kiện khi người dùng nhập liệu vào ô tìm kiếm
   const handleSearch = (e) => {
@@ -80,8 +90,8 @@ const NavbarComponent = () => {
 
     // Lọc danh sách sản phẩm dựa trên input của người dùng
     if (query) {
-      const filteredSuggestions = listnameProduct.filter((product) =>
-        product.toLowerCase().includes(query.toLowerCase()) // Lọc các sản phẩm có chứa từ khóa tìm kiếm
+      const filteredSuggestions = listnameProduct.filter(
+        (product) => product.toLowerCase().includes(query.toLowerCase()) // Lọc các sản phẩm có chứa từ khóa tìm kiếm
       );
       setSuggestions(filteredSuggestions);
     } else {
@@ -163,7 +173,7 @@ const NavbarComponent = () => {
                       boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
                     }}
                   >
-                    {suggestions.map((suggestion, index) => (
+                    {suggestions?.map((suggestion, index) => (
                       <ListGroup.Item key={index} style={{ cursor: "pointer" }}>
                         {suggestion} {/* Tùy chỉnh cách hiển thị gợi ý */}
                       </ListGroup.Item>
@@ -183,7 +193,7 @@ const NavbarComponent = () => {
                         to="/user-profile"
                       >
                         <FontAwesomeIcon icon={faUser} />
-                        {userData.username}
+                        {"   " +userData.username}
                       </Button>
                     </>
                   ) : (
@@ -199,14 +209,19 @@ const NavbarComponent = () => {
                     </>
                   )}
                 </>
-                <Button
-                  variant="warning"
-                  className="text-dark mx-2"
-                  as={Link}
-                  to="/cart"
-                >
-                  <FontAwesomeIcon icon={faShoppingCart} /> Giỏ hàng
-                </Button>
+                <div className="cart-container">
+                  <Button
+                    variant="warning"
+                    className="text-dark mx-2 cart-button"
+                    as={Link}
+                    to="/cart"
+                  >
+                    <FontAwesomeIcon icon={faShoppingCart} /> Giỏ hàng
+                    {cartData?.length > 0 && (
+                      <span className="cart-badge">{cartData?.length}</span>
+                    )}
+                  </Button>
+                </div>
                 <Button variant="warning" className="text-dark">
                   <FontAwesomeIcon icon={faBell} /> Thông báo
                 </Button>
@@ -215,12 +230,9 @@ const NavbarComponent = () => {
 
             {/* Product Categories */}
             <Col xs={12} className="mt-2">
-
               <Nav className="justify-content-between">
                 <>
-                  <Button
-                    variant="warning"
-                    onClick={handleShow}>
+                  <Button variant="warning" onClick={handleShow}>
                     <FontAwesomeIcon icon={faBars} />
                     Danh mục sản phẩm
                   </Button>
@@ -230,8 +242,12 @@ const NavbarComponent = () => {
                     </Offcanvas.Header>
                     <Offcanvas.Body>
                       <ListGroup>
-                        {categories.map((category, index) => (
-                          <ListGroup.Item key={index} action className="d-flex align-items-center">
+                        {categories?.map((category, index) => (
+                          <ListGroup.Item
+                            key={index}
+                            action
+                            className="d-flex align-items-center"
+                          >
                             <span className="">{category.icon}</span>
                             {category.name}
                           </ListGroup.Item>

@@ -10,6 +10,7 @@ import { saveAccessToken } from '../utils/commonFunction';
 import { useOrdersContext } from '../contexts/OrderContext';
 import { useUserContext } from '../contexts/UserContext';
 import { useAddressContext } from '../contexts/AddressContext';
+import { useCartContext } from "../contexts/Cart_Context";
 
 const AuthForm = () => {
   const [username, setUsername] = useState("");
@@ -20,6 +21,7 @@ const AuthForm = () => {
 
   const { userState, fetchUser } = useUserContext();
   const { addressState, fetchAddress } = useAddressContext();
+  const { fetchCart, setCart } = useCartContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,11 +65,12 @@ const AuthForm = () => {
   }
 
   const handleGetUserData = async (accessToken) => {
+    if(!accessToken)
+      return;
     const user = await fetchUser(accessToken);
-
-    console.log('user', user)
-
     await fetchAddress(accessToken);
+    await fetchCart(accessToken);
+
     if (user.idRole === 1) {
       navigate('/admin');
     }

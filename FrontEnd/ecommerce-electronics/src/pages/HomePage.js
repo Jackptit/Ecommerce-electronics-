@@ -37,10 +37,10 @@ const Home = () => {
   };
   const { productState } = useProductContext();
   console.log("data product", productState.products);
-  const totalPages = Math.ceil(productState.products.length / productsPerPage);
+  const totalPages = Math.ceil(productState.products?.length / productsPerPage);
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = productState.products.slice(indexOfFirstProduct, indexOfLastProduct);
+  const currentProducts = productState.products?.slice(indexOfFirstProduct, indexOfLastProduct);
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo(0, 0);
@@ -64,14 +64,14 @@ const Home = () => {
             </div>
           </Slider>
         </SliderWrapper>
-        <FeaturedProducts title={`Tất cả sản phẩm : ${productState.products.length} sản phẩm`} productList={currentProducts} />
+        <FeaturedProducts title={`Tất cả sản phẩm : ${productState.products?.length} sản phẩm`} productList={currentProducts} />
         <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
           <Pagination>
             <Pagination.Prev
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
             />
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
+            {Array.from({ length: totalPages || 0 }, (_, i) => i + 1).map((pageNumber) => (
               <Pagination.Item
                 key={pageNumber}
                 active={pageNumber === currentPage}

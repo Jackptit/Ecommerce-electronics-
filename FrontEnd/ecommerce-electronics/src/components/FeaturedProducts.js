@@ -36,8 +36,7 @@ const FeaturedProducts = ({title,productList}) => {
     }
   };
   useEffect(() => {
-    let updatedList =productList 
-      .filter(product => product.price >= priceRange[0] && product.price <= priceRange[1]);
+    let updatedList =productList?.filter(product => product.price >= priceRange[0] && product.price <= priceRange[1]);
 
     if (sortOption === "price-asc") {
       updatedList = updatedList.sort((a, b) => a.price - b.price);
@@ -113,13 +112,13 @@ const FeaturedProducts = ({title,productList}) => {
                 
                 </Container>
                     <div className='products'>
-                        {products.length ? products.map((product) => {
+                        {products?.length ? products?.map((product) => {
                             return <Product key={product.id} {...product} /> })
-                            :productList.map((product) => {
+                            :productList?.map((product) => {
                             return <Product key={product.id} {...product} />;
                         }) 
                         }
-                        {console.log(products.length)}
+                        {console.log(products?.length)}
                     </div>
                 </div>
                 

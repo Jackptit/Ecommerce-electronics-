@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import axios from "axios";
 import { getAccessToken } from "../utils/commonFunction";
-import userReducer from "../reducers/userReducer";
+import userReducer from "../reducers/UserReducer";
 import { useAuthContext } from "./Auth_Context";
 import { useAddressContext } from "./AddressContext";
 
