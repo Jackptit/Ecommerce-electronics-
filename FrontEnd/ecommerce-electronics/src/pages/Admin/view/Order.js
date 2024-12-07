@@ -79,7 +79,7 @@ const OrderManagement = () => {
       );
 
       setOrders(updatedOrders);
-      if (status === 2) toast.success("Xác nhận đơn hàng thành công !");
+      if (status === 1) toast.success("Xác nhận đơn hàng thành công !");
       else toast.success("Hủy đơn hàng thành công !");
     } catch (error) {
       console.log("Error update coupon:", error);
@@ -161,18 +161,18 @@ const OrderManagement = () => {
               >
                 {coupon.description}
               </td> */}
-              <td>
-                {order.status === 1 && (
+              <td style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "5px", height: '100%' }}>
+                {order.status === 2 && (
                   <button
                     className="btn btn-primary btn-sm me-3 "
                     style={{ width: "80px" }}
-                    onClick={() => handleConfirmOrder(order, 2)}
+                    onClick={() => handleConfirmOrder(order, 1)}
                   >
                     Xác nhận
                   </button>
                 )}
-                {order.status === 2 && (
-                  <span style={{ marginRight: "10px" }}>
+                {order.status === 1 && (
+                  <span style={{ marginRight: "5px" }}>
                     <i>Đã xác nhận</i>
                   </span>
                 )}

@@ -23,7 +23,7 @@ const initialState = {
 // Provider component
 export const UserProvider = ({ children }) => {
   const [userState, dispatch] = useReducer(userReducer, initialState);
-  const  token  = getAccessToken();
+  const token = getAccessToken();
   //const { addressState, fetchAddress } = useAddressContext();
 
   if (!token) {

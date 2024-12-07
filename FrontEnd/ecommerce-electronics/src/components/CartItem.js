@@ -59,7 +59,7 @@ const CartItem = ({ item }) => {
         return;
       }
 
-      const newItem = {...item, quantity: item.quantity + quantity};
+      const newItem = { ...item, quantity: item.quantity + quantity };
       const response = await axios.put(
         "http://localhost:8080/api/cart_detail",
         newItem,
@@ -79,7 +79,7 @@ const CartItem = ({ item }) => {
     }
   }
 
-  const deleteCartItem  = async (productId) => {  
+  const deleteCartItem = async (productId) => {
     try {
       if (!token) {
         navigate("/login");
@@ -126,6 +126,7 @@ const CartItem = ({ item }) => {
           />
         </Col>
         <Col xs={2}>
+          {console.log(item.product.image)}
           <Image
             src={item.product.image.split(",")[0]}
             alt="image"
@@ -152,8 +153,8 @@ const CartItem = ({ item }) => {
             style={{
               height: '15px',
               display: 'flex',
-              justifyContent: 'center', 
-              alignItems: 'center',    
+              justifyContent: 'center',
+              alignItems: 'center',
               marginRight: '5px'
             }}
             onClick={() =>
@@ -171,9 +172,9 @@ const CartItem = ({ item }) => {
             style={{
               height: '15px',
               display: 'flex',
-              justifyContent: 'center', 
-              alignItems: 'center',    
-               marginLeft: '5px'
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginLeft: '5px'
             }}
             onClick={() => handleIncreaseQuantity(item)}
           >

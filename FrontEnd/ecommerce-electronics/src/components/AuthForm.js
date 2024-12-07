@@ -10,6 +10,7 @@ import { saveAccessToken } from '../utils/commonFunction';
 import { useOrdersContext } from '../contexts/OrderContext';
 import { useUserContext } from '../contexts/UserContext';
 import { useAddressContext } from '../contexts/AddressContext';
+import { useCartContext } from "../contexts/Cart_Context";
 
 const AuthForm = () => {
   const [username, setUsername] = useState("");
@@ -20,6 +21,7 @@ const AuthForm = () => {
 
   const { userState, fetchUser } = useUserContext();
   const { addressState, fetchAddress } = useAddressContext();
+  const { fetchCart, setCart } = useCartContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,7 +46,7 @@ const AuthForm = () => {
           },
           body: JSON.stringify({ "phone": username, "password": password }),
         }).then(response => response.json());
-        
+
         saveAccessToken(response.accessToken); //save token to localstored
 
         if (response.accessToken !== undefined) {
@@ -62,13 +64,17 @@ const AuthForm = () => {
     }
   }
 
-  const handleGetUserData = async(accessToken ) =>{
+  const handleGetUserData = async (accessToken) => {
+    if(!accessToken)
+      return;
     const user = await fetchUser(accessToken);
     await fetchAddress(accessToken);
-    if(user.idRole === 1){
+    await fetchCart(accessToken);
+
+    if (user.idRole === 1) {
       navigate('/admin');
     }
-    else{
+    else {
       navigate('/');
     }
   }

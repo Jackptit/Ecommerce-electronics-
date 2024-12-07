@@ -7,6 +7,7 @@ import { Container, Row, Col, Button, Card, Form } from "react-bootstrap";
 import { getAccessToken } from "../utils/commonFunction";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import moment from "moment-timezone";
 
 const CartPage = () => {
   const token = getAccessToken();
@@ -18,25 +19,26 @@ const CartPage = () => {
     cartBuy,
     selectAllCartItem,
     unSelectAllCartItem,
+    fetchCart
   } = useCartContext();
 
+
+  cart.sort((a, b) => {
+    const timeA = moment(a.create_at).valueOf();
+    const timeB = moment(b.create_at).valueOf();
+    return timeB - timeA; 
+  });
+
+  useEffect(() => {
+    fetchCarts();
+  }, [token]);
+
   const totalAmount = cartBuy.reduce((total, item) => {
-    const itemTotal = item.product.price * (item.quantity || 1);
+    const itemTotal = item.product?.price * (item?.quantity || 1);
     return total + itemTotal;
   }, 0);
 
-  const isCheckAll = cart.length === cartBuy.length;
-
-  useEffect(() => {
-    const fetchCartData = async () => {
-      if (token && cart.length === 0) {
-        console.log("Fetching cart...");
-        await fetchCarts(token);
-      }
-    };
-
-    fetchCartData();
-  }, [token]);
+  const isCheckAll = cart?.length === cartBuy?.length;
 
   const fetchCarts = async () => {
     try {
@@ -44,18 +46,11 @@ const CartPage = () => {
         navigate("/login");
         return;
       }
-      const carts = await axios.get("http://localhost:8080/api/cart_detail", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      dispatch({ type: "SET_CART", payload: carts.data });
+      if(cart.length === 0)
+        await fetchCart(token)
+
     } catch (error) {
-      console.log("Error fetching coupon:", error.status);
-      if (error.status === 401) {
-        navigate("/login");
-      }
+      console.log("Error:", error.status);
     }
   };
 
@@ -66,6 +61,7 @@ const CartPage = () => {
       unSelectAllCartItem();
     }
   };
+
   return (
     <Container style={{ height: cart.length === 0 ? "500px" : "auto" }}>
       <h2 className="text-center mb-4">Giỏ hàng</h2>
@@ -92,7 +88,7 @@ const CartPage = () => {
               <Col xs={2}>Thành tiền</Col>
               <Col xs={1}></Col> {/* Cột cho nút Xóa */}
             </Row>
-            {cart.map((item) => (
+            {cart?.map((item) => (
               <CartItem key={item.id} item={item} />
             ))}
           </Col>
