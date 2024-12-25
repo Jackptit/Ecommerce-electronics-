@@ -8,7 +8,7 @@ import { getAccessToken } from "../utils/commonFunction";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import moment from "moment-timezone";
-
+import { Helmet } from "react-helmet";
 const CartPage = () => {
   const token = getAccessToken();
   const navigate = useNavigate();
@@ -63,6 +63,11 @@ const CartPage = () => {
   };
 
   return (
+    <>
+     <Helmet>
+        <title>Giỏ hàng</title>
+        <meta name="description" content="Đây là trang chủ của ứng dụng." />
+      </Helmet>
     <Container style={{ height: cart.length === 0 ? "500px" : "auto" }}>
       <h2 className="text-center mb-4">Giỏ hàng</h2>
       {cart.length === 0 ? (
@@ -126,6 +131,7 @@ const CartPage = () => {
         </Row>
       )}
     </Container>
+    </>
   );
 };
 

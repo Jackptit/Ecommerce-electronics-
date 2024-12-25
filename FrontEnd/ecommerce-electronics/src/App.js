@@ -20,7 +20,7 @@ import AuthForm from "./components/AuthForm";
 import PaymentPage from "./pages/PaymentPage";
 import { getAccessToken } from "./utils/commonFunction";
 import { useUserContext } from "./contexts/UserContext";
-
+import FilterPage from "./pages/FilterPage";
 function App() {
   return (
     <Router>
@@ -61,6 +61,7 @@ function MainApp() {
   const isExcluded = excludedRoutes.some((route) =>
     location.pathname.includes(route)
   );
+  
   return (
     <>
       {!isExcluded && (
@@ -79,6 +80,7 @@ function MainApp() {
         <Route path="/register" element={<Register />} />
         <Route path="/user-profile/*" element={<UserProfile />} />
         <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/filter-product" element={<FilterPage />} />
 
         <Route
           path="/admin/*"

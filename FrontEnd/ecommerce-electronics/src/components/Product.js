@@ -9,23 +9,45 @@ import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons";
 import { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import { getAccessToken } from "../utils/commonFunction";
-import moment from "moment-timezone";
-
+import moment from "moment-timezone"; 
+import {useUserContext} from "../contexts/UserContext";
 const Product = (product) => {
   const { addToCart, countCartTotals } = useCartContext();
+  const {updateFavoritProduct} =useUserContext();
   const token = getAccessToken();
   const navigate = useNavigate();
 
   const handleBuyNow = async () => {
     if (!token) {
       navigate("/login");
+      return;
     }
     // Gọi hàm addToCart (thêm sản phẩm vào giỏ hàng)
     await handleAddToCart(token);
     
   };
   const [hovered, setHovered] = useState(false);
-  const toggleFavorite = () => {};
+  const toggleFavorite =async () => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    try{
+      const updateFavourite = await updateFavoritProduct(product.id);
+      console.log("day la status về nút yêu thích",updateFavourite);
+      if(updateFavourite.status == 200){
+        toast.success("Đã thêm vào yêu thích!");
+      }
+      else{
+        toast.error("Đã xảy ra lỗi, vui lòng thử lại sau!");
+      }
+    }
+    catch(error){
+      console.log("error update favourite",error);
+      toast.error("Đã xảy ra lỗi, vui lòng thử lại sau!");
+    }
+    
+  };
   const images = product.image.split(",");
   const imageMain = images[0];
 
@@ -60,8 +82,6 @@ const Product = (product) => {
               <img src={imageMain} alt={product.name} />
             </div>
           </Link>
-          <span className="w-tag">Phone</span>
-          <span className="w-tag">256gb</span>
           <footer>
             <Link
               to={`/product/${product.id}`}

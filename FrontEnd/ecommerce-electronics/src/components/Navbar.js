@@ -36,7 +36,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useUserContext } from "../contexts/UserContext";
 import { useCartContext } from "../contexts/Cart_Context";
 import { getAccessToken } from "../utils/commonFunction";
-
+import {useNavigate} from "react-router-dom";
 const NavbarComponent = () => {
   const { userState, dispatch, fetchUser } = useUserContext();
   const { cart } = useCartContext();
@@ -48,7 +48,12 @@ const NavbarComponent = () => {
   const handleShow = () => setShow(true);
   const [searchQuery, setSearchQuery] = useState(""); // State để lưu giá trị tìm kiếm
   const [suggestions, setSuggestions] = useState([]); // State để lưu danh sách gợi ý
-
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const navigate = useNavigate();
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const handleCategoryClick = (categoryid) => {
+   navigate("/filter-product", { state: { categoryid } })
+  };
   const token = getAccessToken();
   useEffect(() => {
     if (userState.user) {
@@ -98,6 +103,13 @@ const NavbarComponent = () => {
       setSuggestions([]); // Nếu không có từ khóa tìm kiếm, không hiển thị gợi ý
     }
   };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery) {
+      // Điều hướng sang FilterPage và truyền searchQuery qua state
+      navigate("/filter-product", { state: { searchQuery } });
+    }
+  };
   return (
     <>
       <Navbar bg="warning" expand="lg" variant="light" sticky="top">
@@ -134,6 +146,8 @@ const NavbarComponent = () => {
               <Form
                 className="flex-grow-1 mx-4"
                 style={{ position: "relative" }}
+                onBlur={() => setShowSuggestions(false)} // Ẩn gợi ý khi mất focus
+                onFocus={() => setShowSuggestions(true)}
               >
                 <InputGroup>
                   <FormControl
@@ -144,6 +158,11 @@ const NavbarComponent = () => {
                     style={{ borderRadius: "20px", paddingRight: "20px" }} // Padding để chừa chỗ cho biểu tượng
                     value={searchQuery}
                     onChange={handleSearch}
+                    onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSubmit(e); // Gọi handleSubmit khi nhấn Enter
+                    }
+                  }}
                   />
                   <FontAwesomeIcon
                     icon={faSearch}
@@ -157,7 +176,7 @@ const NavbarComponent = () => {
                     }}
                   />
                 </InputGroup>
-                {suggestions.length > 0 && (
+                {showSuggestions && suggestions.length > 0 && (
                   <ListGroup
                     style={{
                       position: "absolute",
@@ -246,6 +265,7 @@ const NavbarComponent = () => {
                           <ListGroup.Item
                             key={index}
                             action
+                            onClick={() => handleCategoryClick(category.id)} // Hàm xử lý sự kiện
                             className="d-flex align-items-center"
                           >
                             <span className="">{category.icon}</span>

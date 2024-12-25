@@ -33,6 +33,16 @@ const Sidebar = () => {
             <i className="fas fa-shopping-cart"></i> <strong>Orders</strong>
           </Link>
         </li>
+        <li>
+          <Link to="/admin/userManager">
+            <i className="fas fa-user"></i> <strong>Users</strong>
+          </Link>
+        </li>
+        <li>
+          <Link to="/admin/statistical">
+            <i className="fas fa-chart-bar"></i> <strong>Statistical</strong>
+          </Link>
+        </li>
       </ul>
     </div>
   );

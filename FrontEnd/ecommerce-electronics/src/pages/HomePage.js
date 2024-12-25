@@ -17,7 +17,7 @@ import { useProductContext } from "../contexts/Product_Context";
 import { Pagination } from "react-bootstrap";
 
 import Livechat from "../components/Livechat";
-
+import { Helmet } from "react-helmet";
 
 
 const Home = () => {
@@ -48,6 +48,10 @@ const Home = () => {
   return (
     <>
       <Wrapper>
+      <Helmet>
+        <title>Trang Chủ - EEShop</title>
+        <meta name="description" content="Đây là trang chủ của ứng dụng." />
+      </Helmet>
         <Livechat />
         {isHomePage && <Livechat />}
 
